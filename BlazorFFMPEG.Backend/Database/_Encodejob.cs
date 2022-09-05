@@ -29,7 +29,7 @@ public partial class EncodeJob
         return proxy;
     }
     
-    private static Hash generateId(string codec, string file)
+    public static Hash generateId(string codec, string file)
     {
         string key = $"{codec}{file}";
 
