@@ -7,12 +7,12 @@ namespace BlazorFFMPEG.Backend.Database
     {
         public ConstantsStatus()
         {
-            Encodejobs = new HashSet<Encodejob>();
+            EncodeJobs = new HashSet<EncodeJob>();
         }
 
         public int Id { get; set; }
         public string? Description { get; set; }
 
-        public virtual ICollection<Encodejob> Encodejobs { get; set; }
+        public virtual ICollection<EncodeJob> EncodeJobs { get; set; }
     }
 }

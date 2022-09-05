@@ -17,7 +17,7 @@ namespace BlazorFFMPEG.Backend.Database
         }
 
         public virtual DbSet<ConstantsStatus> ConstantsStatuses { get; set; } = null!;
-        public virtual DbSet<Encodejob> Encodejobs { get; set; } = null!;
+        public virtual DbSet<EncodeJob> EncodeJobs { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -39,21 +39,25 @@ namespace BlazorFFMPEG.Backend.Database
                 entity.Property(e => e.Description).HasColumnName("description");
             });
 
-            modelBuilder.Entity<Encodejob>(entity =>
+            modelBuilder.Entity<EncodeJob>(entity =>
             {
                 entity.HasKey(e => e.Jobid)
-                    .HasName("encodejobs_pkey");
+                    .HasName("encode_jobs_pkey");
 
-                entity.ToTable("encodejobs");
+                entity.ToTable("encode_jobs");
 
                 entity.Property(e => e.Jobid).HasColumnName("jobid");
+
+                entity.Property(e => e.Codec).HasColumnName("codec");
+
+                entity.Property(e => e.Path).HasColumnName("path");
 
                 entity.Property(e => e.Status)
                     .ValueGeneratedOnAdd()
                     .HasColumnName("status");
 
                 entity.HasOne(d => d.StatusNavigation)
-                    .WithMany(p => p.Encodejobs)
+                    .WithMany(p => p.EncodeJobs)
                     .HasForeignKey(d => d.Status)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("fk_status");
