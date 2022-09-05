@@ -64,5 +64,32 @@ namespace BlazorFFMPEG.Data
 
             return availableCodecs;
         }
+        
+        public void startEncode(string filePath, string selectedCodec)
+        {
+            Process ffmpegProcess = new Process
+            {
+                StartInfo =
+                {
+                    CreateNoWindow = true,
+                    ErrorDialog = false,
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false
+                }
+            };
+
+            ffmpegProcess.OutputDataReceived += (_, args) => Console.WriteLine(args.Data);
+            ffmpegProcess.ErrorDataReceived += (_, args) => Console.WriteLine(args.Data);
+
+            ffmpegProcess.StartInfo.FileName = "ffmpeg";
+            ffmpegProcess.StartInfo.Arguments = $" -i {filePath} -c:v {selectedCodec} out.mp4";
+
+            ffmpegProcess.Start();
+
+            ffmpegProcess.BeginErrorReadLine();
+            ffmpegProcess.BeginOutputReadLine();
+            ffmpegProcess.WaitForExit();
+        }
     }
 }
