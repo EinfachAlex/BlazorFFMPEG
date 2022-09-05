@@ -1,0 +1,43 @@
+﻿@page "/fetchdata"
+
+<PageTitle>Weather forecast</PageTitle>
+
+@using BlazorFFMPEG.Data
+@inject FfmpegCodecService ForecastService
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (forecasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Temp. (C)</th>
+                <th>Temp. (F)</th>
+                <th>Summary</th>
+            </tr>
+        </thead>
+        <select name="codecs">
+            @foreach (var forecast in forecasts)
+            {
+                <option>@forecast.name</option>
+            }
+        </select>
+    </table>
+}
+
+@code {
+    private List<FfmpegCodec> forecasts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        forecasts = await ForecastService.getAvailableCodecs();
+    }
+}
