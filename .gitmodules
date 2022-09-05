@@ -1,0 +1,3 @@
+[submodule "EinfachAlexUtils"]
+	path = EinfachAlexUtils
+	url = https://git.einfachmc.de/alexander/EinfachAlexUtils
