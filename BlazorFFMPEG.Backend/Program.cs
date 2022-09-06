@@ -1,3 +1,5 @@
+using BlazorFFMPEG.Backend.Modules.Jobs;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -21,5 +23,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+JobManager.getInstance().startJobThreads();
 
 app.Run();
