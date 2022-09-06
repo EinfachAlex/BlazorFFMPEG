@@ -61,7 +61,7 @@ namespace BlazorFFMPEG.Data
             foreach (FfmpegCodec popularCodec in popularCodecs)
             {
                 availableCodecs.Remove(popularCodec);
-                availableCodecs.Insert(1, popularCodec);
+                availableCodecs.Insert(0, popularCodec);
             }
 
             return availableCodecs;
