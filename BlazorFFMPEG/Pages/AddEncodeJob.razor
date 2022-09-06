@@ -1,53 +1,6 @@
 ﻿@page "/addEncodeJob"
 <PageTitle>Add encode job</PageTitle>
 
-@using BlazorFFMPEG.Data
-@inject FfmpegCodecService FfmpegCodecService
+@using BlazorFFMPEG.Components
 
-@if (codecs == null)
-{
-    <p>
-        <em>Loading...</em>
-    </p>
-}
-else
-{
-    <select name="codecs" id="codecSelection" @onchange="onCodecSelectionChange">
-        @foreach (var forecast in codecs)
-        {
-            <option value="@forecast.name">@forecast.name</option>
-        }
-    </select>
-    
-    <input @bind="filePath"/>
-
-    <button class="btn btn-primary" @onclick="startEncode">Start Encode</button>}
-}      
-
-
-@code {
-    private List<FfmpegCodec> codecs;
-    private string filePath;
-    private FfmpegCodec selectedCodec;
-    
-    protected override async Task OnInitializedAsync()
-    {
-        codecs = await FfmpegCodecService.getAvailableCodecs_WithCustomSort();
-    }
-    
-    protected void selectChange()
-    {
-    }
-    
-    protected void startEncode()
-    {
-        FfmpegCodecService.startEncode(filePath, selectedCodec.name);
-    }
-    
-    private void onCodecSelectionChange(ChangeEventArgs e)
-    {
-        FfmpegCodec selectedCodec = codecs.Single(c => c.name.ToUpper() == e.Value.ToString().ToUpper()) ?? throw new ArgumentNullException("codecs.Single(c => c.name == e.Value)");
-
-        this.selectedCodec = selectedCodec;
-    }
-}
+<CodecSelectionDropDown></CodecSelectionDropDown>

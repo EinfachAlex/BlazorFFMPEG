@@ -1,0 +1,57 @@
+﻿@inject FfmpegCodecService FfmpegCodecService
+@using BlazorFFMPEG.Data
+<div class="btn-group">
+    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="true" aria-expanded="false">
+        <span>Codec: @selectedCodec?.name</span>
+    </button>
+    <ul class="dropdown-menu gap-1 p-2 rounded-3 mx-0 shadow w-220px overflow-auto" style="">
+
+        
+        @foreach (var availableCodec in availableCodecs)
+        {
+            <li>
+                <a class="dropdown-item rounded-2" onclick="@(() => onCodecSelect(availableCodec))">
+                    @availableCodec.name
+                    <div class="codecfavorite">
+                        <span class="oi oi-star" aria-hidden="true"></span>
+                    </div>
+                </a>
+            </li>
+        }
+    </ul>
+</div>
+
+
+<label for="customRange3" class="form-label">Example range</label>
+<input type="range" class="form-range" min="0" max="5" step="0.5" id="customRange3">
+
+<br/>
+
+<input @bind="filePath"/>
+
+<br/>
+
+<button class="btn btn-primary" @onclick="startEncode">Start Encode</button>
+
+
+@code {
+    private List<FfmpegCodec> availableCodecs;
+    private string filePath;
+    private FfmpegCodec? selectedCodec;
+
+    protected override async Task OnInitializedAsync()
+    {
+        availableCodecs = await FfmpegCodecService.getAvailableCodecs_WithCustomSort();
+    }
+
+    private void startEncode()
+    {
+        FfmpegCodecService.startEncode(filePath, selectedCodec.name);
+    }
+
+    private void onCodecSelect(FfmpegCodec selectedCodec)
+    {
+        this.selectedCodec = selectedCodec;
+        StateHasChanged();
+    }
+}
