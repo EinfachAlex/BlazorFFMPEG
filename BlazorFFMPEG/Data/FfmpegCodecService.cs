@@ -27,9 +27,11 @@ namespace BlazorFFMPEG.Data
             {
                 try
                 {
-
+                    
                     FfmpegCodec codec = new FfmpegCodec(args.Data.Split(' ')[2].Split(' ')[0]);
 
+                    if (codec.name == "=") return;
+                    
                     availableCodecs.Add(codec);
                 }
                 catch (Exception e)
