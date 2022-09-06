@@ -62,3 +62,16 @@ a, .btn-link {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
+
+.codecfavorite {
+    display: inline;
+    margin-right: 20px;
+    position: absolute;
+    right: 0;
+    color: darkgrey;
+}
+
+.dropdown-menu {
+    max-height: 280px;
+    overflow-y: auto;
+}
