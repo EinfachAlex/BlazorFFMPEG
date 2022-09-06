@@ -19,6 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\BlazorFFMPEG.Shared\BlazorFFMPEG.Shared.csproj" />
       <ProjectReference Include="..\EinfachAlexUtils\EinfachAlex.Utils.csproj" />
     </ItemGroup>
 

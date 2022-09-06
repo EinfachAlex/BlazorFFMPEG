@@ -1,5 +1,8 @@
 ﻿@inject FfmpegCodecService FfmpegCodecService
 @using BlazorFFMPEG.Data
+@using BlazorFFMPEG.Shared
+@using BlazorFFMPEG.Shared.DTO
+
 <div class="btn-group">
     <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="true" aria-expanded="false">
         <span>Codec: @selectedCodec?.name</span>
@@ -35,9 +38,9 @@
 
 
 @code {
-    private List<FfmpegCodec> availableCodecs;
+    private List<Encoder> availableCodecs = new List<Encoder>();
     private string filePath;
-    private FfmpegCodec? selectedCodec;
+    private Encoder? selectedCodec;
 
     protected override async Task OnInitializedAsync()
     {
@@ -49,7 +52,7 @@
         FfmpegCodecService.startEncode(filePath, selectedCodec.name);
     }
 
-    private void onCodecSelect(FfmpegCodec selectedCodec)
+    private void onCodecSelect(Encoder selectedCodec)
     {
         this.selectedCodec = selectedCodec;
         StateHasChanged();

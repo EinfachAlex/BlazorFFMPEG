@@ -42,23 +42,14 @@ namespace BlazorFFMPEG.Data
             ffmpegProcess.StartInfo.FileName = "ffmpeg";
             ffmpegProcess.StartInfo.Arguments = "-encoders";
 
-            ffmpegProcess.Start();
-
-            ffmpegProcess.BeginErrorReadLine();
-            ffmpegProcess.BeginOutputReadLine();
-            ffmpegProcess.WaitForExit();
-
-            return availableCodecs;
-        }
-
-        public async Task<List<FfmpegCodec>> getAvailableCodecs_WithCustomSort()
+        public async Task<List<Encoder>> getAvailableCodecs_WithCustomSort()
         {
-            List<FfmpegCodec> availableCodecs = await getAvailableCodecs();
+            List<Encoder> availableCodecs = await getAvailableCodecs();
 
-            List<FfmpegCodec> popularCodecs = availableCodecs.FindAll(x => x.name.ToUpper() == CODEC_H264
-                                                                           || x.name.ToUpper() == CODEC_HEVC_NVENC);
+            List<Encoder> popularCodecs = availableCodecs.FindAll(x => x.name.ToUpper() == CODEC_H264
+                                                                       || x.name.ToUpper() == CODEC_HEVC_NVENC);
             
-            foreach (FfmpegCodec popularCodec in popularCodecs)
+            foreach (Encoder popularCodec in popularCodecs)
             {
                 availableCodecs.Remove(popularCodec);
                 availableCodecs.Insert(0, popularCodec);

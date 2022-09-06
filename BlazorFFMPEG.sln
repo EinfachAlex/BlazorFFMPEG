@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EinfachAlex.Utils", "Einfac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorFFMPEG.Backend.Tests", "BlazorFFMPEG.Backend.Tests\BlazorFFMPEG.Backend.Tests.csproj", "{C6F62172-F31F-480D-BB8F-D649E8020652}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorFFMPEG.Shared", "BlazorFFMPEG.Shared\BlazorFFMPEG.Shared.csproj", "{9CCBE10F-E66A-493D-B508-15EA790E3631}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{C6F62172-F31F-480D-BB8F-D649E8020652}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6F62172-F31F-480D-BB8F-D649E8020652}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6F62172-F31F-480D-BB8F-D649E8020652}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CCBE10F-E66A-493D-B508-15EA790E3631}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CCBE10F-E66A-493D-B508-15EA790E3631}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CCBE10F-E66A-493D-B508-15EA790E3631}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CCBE10F-E66A-493D-B508-15EA790E3631}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
