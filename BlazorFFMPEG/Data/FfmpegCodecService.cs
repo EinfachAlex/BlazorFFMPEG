@@ -1,4 +1,7 @@
 ﻿using System.Diagnostics;
+using System.Text.Json;
+using BlazorFFMPEG.Shared.DTO;
+using RestSharp;
 
 namespace BlazorFFMPEG.Data
 {
@@ -7,40 +10,18 @@ namespace BlazorFFMPEG.Data
         const string CODEC_H264 = "LIBX264";
         const string CODEC_HEVC_NVENC = "HEVC_NVENC";
 
-        public async Task<List<FfmpegCodec>> getAvailableCodecs()
+        public async Task<List<Encoder>> getAvailableCodecs()
         {
-            List<FfmpegCodec> availableCodecs = new List<FfmpegCodec>();
+            var client = new RestClient("https://localhost:7208/");
+            var request = new RestRequest("getAvailableEncoders", Method.Get);
+            
+            var response = await client.GetAsync(request);
+            Console.WriteLine(response.Content);
 
-            Process ffmpegProcess = new Process
-            {
-                StartInfo =
-                {
-                    CreateNoWindow = true,
-                    ErrorDialog = false,
-                    RedirectStandardError = true,
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false
-                }
-            };
-
-            ffmpegProcess.OutputDataReceived += (_, args) =>
-            {
-                try
-                {
-                    
-                    FfmpegCodec codec = new FfmpegCodec(args.Data.Split(' ')[2].Split(' ')[0]);
-
-                    if (codec.name == "=") return;
-                    
-                    availableCodecs.Add(codec);
-                }
-                catch (Exception e)
-                {
-                }
-            };
-
-            ffmpegProcess.StartInfo.FileName = "ffmpeg";
-            ffmpegProcess.StartInfo.Arguments = "-encoders";
+            List<Encoder> encoders = JsonSerializer.Deserialize<List<Encoder>>(response.Content);
+            
+            return encoders;
+        }
 
         public async Task<List<Encoder>> getAvailableCodecs_WithCustomSort()
         {
