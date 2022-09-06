@@ -16,7 +16,8 @@ public partial class EncodeJob
         EncodeJob proxyObject = new EncodeJob()
         {
             Codec = codec,
-            Path = file
+            Path = file,
+            Status = (int)EEncodingStatus.NEW
         };
 
         var proxy = databaseContext.CreateProxy<EncodeJob>();
@@ -24,11 +25,11 @@ public partial class EncodeJob
 
         databaseContext.Add(proxy);
 
-        if(commit) databaseContext.SaveChanges();
+        if (commit) databaseContext.SaveChanges();
 
         return proxy;
     }
-    
+
     public static Hash generateId(string codec, string file)
     {
         string key = $"{codec}{file}";
