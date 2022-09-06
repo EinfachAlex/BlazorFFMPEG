@@ -1,0 +1,42 @@
+﻿@inject FfmpegCodecService FfmpegCodecService
+@using BlazorFFMPEG.Data
+@using BlazorFFMPEG.Shared
+@using BlazorFFMPEG.Shared.DTO
+
+<div class="btn-group">
+    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="true" aria-expanded="false">
+        <span>Quality-Method: @selectedQualityMethod?.name</span>
+    </button>
+    <ul class="dropdown-menu gap-1 p-2 rounded-3 mx-0 shadow w-220px overflow-auto" style="">
+        
+        @foreach (var qualityMethod in availableQualityMethods)
+        {
+            <li>
+                <a class="dropdown-item rounded-2" onclick="@(() => onQualityMethodSelect(qualityMethod))">
+                    @qualityMethod.name
+                    <div>
+                        <span class="oi oi-star" aria-hidden="true"></span>
+                    </div>
+                </a>
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+    private List<AvailableQualityMethod> availableQualityMethods = new List<AvailableQualityMethod>();
+    private string filePath;
+    private AvailableQualityMethod? selectedQualityMethod;
+
+    protected override async Task OnInitializedAsync()
+    {
+        availableQualityMethods = await FfmpegCodecService.getAvailableQualityMethods();
+    }
+    
+
+    private void onQualityMethodSelect(AvailableQualityMethod selectedQualityMethod)
+    {
+        this.selectedQualityMethod = selectedQualityMethod;
+        StateHasChanged();
+    }
+}

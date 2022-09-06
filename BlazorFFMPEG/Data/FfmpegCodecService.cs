@@ -65,5 +65,18 @@ namespace BlazorFFMPEG.Data
             ffmpegProcess.BeginOutputReadLine();
             ffmpegProcess.WaitForExit();
         }
+        
+        public async Task<List<AvailableQualityMethod>> getAvailableQualityMethods()
+        {
+            var client = new RestClient("https://localhost:7208/");
+            var request = new RestRequest("getAvailableQualityMethods", Method.Get);
+            
+            var response = await client.GetAsync(request);
+            Console.WriteLine(response.Content);
+
+            List<AvailableQualityMethod> encoders = JsonSerializer.Deserialize<List<AvailableQualityMethod>>(response.Content);
+            
+            return encoders;
+        }
     }
 }
