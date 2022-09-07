@@ -26,8 +26,13 @@
 @code {
     private List<AvailableQualityMethod> availableQualityMethods = new List<AvailableQualityMethod>();
     private string filePath;
-    private AvailableQualityMethod? selectedQualityMethod;
+    
+    [Parameter]
+    public AvailableQualityMethod? selectedQualityMethod { get; set; }
 
+    [Parameter]
+    public EventCallback<AvailableQualityMethod> selectedQualityMethodChanged { get; set; }
+    
     protected override async Task OnInitializedAsync()
     {
         availableQualityMethods = await FfmpegCodecService.getAvailableQualityMethods();
@@ -37,6 +42,7 @@
     private void onQualityMethodSelect(AvailableQualityMethod selectedQualityMethod)
     {
         this.selectedQualityMethod = selectedQualityMethod;
+        this.selectedQualityMethodChanged.InvokeAsync(this.selectedQualityMethod);
         StateHasChanged();
     }
 }
