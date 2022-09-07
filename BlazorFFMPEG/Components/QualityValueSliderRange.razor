@@ -1,0 +1,46 @@
+﻿@inject FfmpegCodecService FfmpegCodecService
+@using BlazorFFMPEG.Data
+@using BlazorFFMPEG.Shared
+@using BlazorFFMPEG.Shared.Constants
+@using BlazorFFMPEG.Shared.DTO
+
+<div class="btn-group">
+    
+    @if (selectedQualityMethod?.name == EQualityMethods.Bitrate.ToString())
+    {
+        <input type="range" class="form-range" min="0" max="100000" step="500" id="bitrateRange" value="@qualityValue" @oninput="@((args) => onQualityValueChange(args))">
+
+    }
+    else if (selectedQualityMethod?.name == EQualityMethods.CQ.ToString())
+    {
+        <input type="range" class="form-range" min="0" max="63" step="1" id="cqRange" value="@qualityValue" @oninput="@((args) => onQualityValueChange(args))">
+    }
+
+</div>
+
+@code {
+    [Parameter]
+    public AvailableQualityMethod? selectedQualityMethod { get; set; }
+
+    [Parameter]
+    public EventCallback<AvailableQualityMethod> selectedQualityMethodChanged { get; set; }
+
+
+    [Parameter]
+    public int qualityValue { get; set; }
+
+    [Parameter] public EventCallback<int> qualityValueChanged { get; set; }
+
+    private List<Encoder> availableCodecs = new List<Encoder>();
+    private Encoder? selectedCodec;
+
+    protected override async Task OnInitializedAsync()
+    {
+        availableCodecs = await FfmpegCodecService.getAvailableCodecs_WithCustomSort();
+    }
+
+    private void onQualityValueChange(ChangeEventArgs args)
+    {
+        this.qualityValue = Convert.ToInt32(args.Value);
+    }
+}

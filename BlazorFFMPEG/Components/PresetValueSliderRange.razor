@@ -1,0 +1,25 @@
+﻿@inject FfmpegCodecService FfmpegCodecService
+@using BlazorFFMPEG.Data
+@using BlazorFFMPEG.Shared
+@using BlazorFFMPEG.Shared.Constants
+@using BlazorFFMPEG.Shared.DTO
+
+<div class="btn-group">
+
+    <label for="customRange3" class="form-label">Preset from to</label>
+    <input type="range" class="form-range" min="1" max="13" step="1" id="bitrateRange" value="@presetValue" @oninput="@((args) => onPresetValueChange(args))">
+
+</div>
+
+@code {
+    [Parameter]
+    public Int16 presetValue { get; set; }
+
+    [Parameter]
+    public EventCallback<Int16> presetValueChanged { get; set; }
+    
+    private void onPresetValueChange(ChangeEventArgs args)
+    {
+        this.presetValue = Convert.ToInt16(args.Value);
+    }
+}

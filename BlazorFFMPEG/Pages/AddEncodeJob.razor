@@ -2,6 +2,24 @@
 <PageTitle>Add encode job</PageTitle>
 
 @using BlazorFFMPEG.Components
+@using BlazorFFMPEG.Shared.Constants
+@using BlazorFFMPEG.Shared.DTO
 
 <CodecSelectionDropDown></CodecSelectionDropDown>
-<QualityMethodSelectionDropDown></QualityMethodSelectionDropDown>
+<QualityMethodSelectionDropDown @bind-selectedQualityMethod="selectedQualityMethod"></QualityMethodSelectionDropDown>
+<QualityValueSliderRange @bind-selectedQualityMethod="selectedQualityMethod"></QualityValueSliderRange>
+
+<br/>
+
+<input @bind="filePath"/>
+
+<br/>
+
+<button class="btn btn-primary" >Start Encode</button>
+
+@code
+{
+    [Parameter]
+    public AvailableQualityMethod? selectedQualityMethod { get; set; }
+    private string filePath = "autistenkicker";
+}
