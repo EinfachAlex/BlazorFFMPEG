@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
+using BlazorFFMPEG.Shared.Constants;
 using BlazorFFMPEG.Shared.DTO;
 using RestSharp;
 
@@ -7,9 +8,6 @@ namespace BlazorFFMPEG.Data
 {
     public class FfmpegCodecService
     {
-        const string CODEC_H264 = "LIBX264";
-        const string CODEC_HEVC_NVENC = "HEVC_NVENC";
-
         public async Task<List<Encoder>> getAvailableCodecs()
         {
             var client = new RestClient("https://localhost:7208/");
@@ -27,8 +25,8 @@ namespace BlazorFFMPEG.Data
         {
             List<Encoder> availableCodecs = await getAvailableCodecs();
 
-            List<Encoder> popularCodecs = availableCodecs.FindAll(x => x.name.ToUpper() == CODEC_H264
-                                                                       || x.name.ToUpper() == CODEC_HEVC_NVENC);
+            List<Encoder> popularCodecs = availableCodecs.FindAll(x => x.name.ToUpper() == EEncoders.LIBX264
+                                                                       || x.name.ToUpper() == EEncoders.HEVC_NVENC);
             
             foreach (Encoder popularCodec in popularCodecs)
             {
@@ -39,7 +37,7 @@ namespace BlazorFFMPEG.Data
             return availableCodecs;
         }
         
-        public void startEncode(string filePath, string selectedCodec)
+        public async Task startEncode(string filePath, string selectedCodec)
         {
             Process ffmpegProcess = new Process
             {

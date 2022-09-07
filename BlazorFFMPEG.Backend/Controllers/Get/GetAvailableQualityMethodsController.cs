@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using BlazorFFMPEG.Backend.Modules.FFMPEG;
+using BlazorFFMPEG.Shared.Constants;
 using BlazorFFMPEG.Shared.DTO;
 using EinfachAlex.Utils.Logging;
 using EinfachAlex.Utils.WebRequest;
@@ -21,8 +22,8 @@ namespace BlazorFFMPEG.Backend.Controllers.Get
 
             List<AvailableQualityMethod> availableQualityMethods = new List<AvailableQualityMethod>()
             {
-                new AvailableQualityMethod("CQ"),
-                new AvailableQualityMethod("Bitrate"),
+                new AvailableQualityMethod(EQualityMethods.Bitrate.ToString()),
+                new AvailableQualityMethod(EQualityMethods.CQ.ToString()),
             };
 
             sw.Stop();
