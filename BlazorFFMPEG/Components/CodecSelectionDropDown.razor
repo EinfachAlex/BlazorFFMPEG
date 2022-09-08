@@ -3,8 +3,10 @@
 @using BlazorFFMPEG.Shared
 @using BlazorFFMPEG.Shared.DTO
 
-<div class="btn-group">
-    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="true" aria-expanded="false">
+<link href="css/Components/DropDown.css" rel="stylesheet">
+
+<div class="btn-group dropDown">
+    <button class="btn btn-secondary dropdown-toggle @(testMethod())" type="button" data-bs-toggle="dropdown" data-bs-auto-close="true" aria-expanded="false">
         <span>Codec: @selectedCodec?.name</span>
     </button>
     <ul class="dropdown-menu gap-1 p-2 rounded-3 mx-0 shadow w-220px overflow-auto" style="">
@@ -43,5 +45,9 @@
         this.selectedCodecChanged.InvokeAsync(this.selectedCodec);
         
         StateHasChanged();
+    }
+    private string testMethod()
+    {
+        return (selectedCodec == null) ? "dropDown-toggle-empty" : "dropDown-toggle-selected";
     }
 }

@@ -1,0 +1,12 @@
+﻿.slider {
+    width: 300px;
+    margin: 10px;
+}
+
+.slider-text {
+    align-content: center;
+    position: absolute;
+    width: 300px;
+    text-align: center;
+    transform: translate(0px,-30px);
+}

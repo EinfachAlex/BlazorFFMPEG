@@ -1,0 +1,15 @@
+﻿.dropDown {
+    margin: 10px;
+}
+
+.dropdown-toggle {
+    width: 300px;
+}
+
+.dropDown-toggle-empty {
+    background-color: indianred;
+}
+
+.dropDown-toggle-selected {
+    background-color: #1b6ec2;
+}
