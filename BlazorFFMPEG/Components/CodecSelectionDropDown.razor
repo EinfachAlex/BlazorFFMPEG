@@ -7,7 +7,7 @@
 
 <div class="btn-group dropDown">
     <button class="btn btn-secondary dropdown-toggle @(testMethod())" type="button" data-bs-toggle="dropdown" data-bs-auto-close="true" aria-expanded="false">
-        <span>Codec: @selectedCodec?.name</span>
+        <span>Codec: @this.addEncodeJobModel.encoder?.name</span>
     </button>
     <ul class="dropdown-menu gap-1 p-2 rounded-3 mx-0 shadow w-220px overflow-auto" style="">
         
@@ -27,12 +27,13 @@
 
 @code {
     private List<Encoder> availableCodecs = new List<Encoder>();
-    
-    [Parameter]
-    public Encoder? selectedCodec { get; set; }
 
     [Parameter]
-    public EventCallback<Encoder> selectedCodecChanged { get; set; }
+    public AddEncodeJobModel addEncodeJobModel { get; set; }
+
+    [Parameter]
+    public EventCallback<AddEncodeJobModel> addEncodeJobModelChanged { get; set; }
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -41,13 +42,14 @@
 
     private void onCodecSelect(Encoder selectedCodec)
     {
-        this.selectedCodec = selectedCodec;
-        this.selectedCodecChanged.InvokeAsync(this.selectedCodec);
+        this.addEncodeJobModel.setEncoder(selectedCodec);
+
+        this.addEncodeJobModelChanged.InvokeAsync(this.addEncodeJobModel);
         
         StateHasChanged();
     }
     private string testMethod()
     {
-        return (selectedCodec == null) ? "dropDown-toggle-empty" : "dropDown-toggle-selected";
+        return (this.addEncodeJobModel.encoder == null) ? "dropDown-toggle-empty" : "dropDown-toggle-selected";
     }
 }

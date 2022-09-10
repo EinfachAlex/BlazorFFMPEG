@@ -1,0 +1,19 @@
+﻿@inject FfmpegCodecService FfmpegCodecService
+@using BlazorFFMPEG.Data
+@using BlazorFFMPEG.Shared
+@using BlazorFFMPEG.Shared.Constants
+@using BlazorFFMPEG.Shared.DTO
+
+<div class="btn-group">
+
+   <input @bind="addEncodeJobModel.filePath" style="margin: 10px"/>
+
+</div>
+
+@code {
+    [Parameter]
+    public AddEncodeJobModel addEncodeJobModel { get; set; }
+
+    [Parameter]
+    public EventCallback<AddEncodeJobModel> addEncodeJobModelChanged { get; set; }
+}

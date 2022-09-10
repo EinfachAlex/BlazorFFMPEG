@@ -6,8 +6,8 @@
 <link href="css/Components/DropDown.css" rel="stylesheet">
 
 <div class="btn-group dropDown">
-    <button class="btn btn-secondary dropdown-toggle @((selectedQualityMethod == null) ? "dropDown-toggle-empty" : "dropDown-toggle-selected")" type="button" data-bs-toggle="dropdown" data-bs-auto-close="true" aria-expanded="false">
-        <span>Quality-Method: @selectedQualityMethod?.name</span>
+    <button class="btn btn-secondary dropdown-toggle @((this.addEncodeJobModel.selectedQualityMethod == null) ? "dropDown-toggle-empty" : "dropDown-toggle-selected")" type="button" data-bs-toggle="dropdown" data-bs-auto-close="true" aria-expanded="false">
+        <span>Quality-Method: @this.addEncodeJobModel.selectedQualityMethod?.name</span>
     </button>
     <ul class="dropdown-menu gap-1 p-2 rounded-3 mx-0 shadow w-220px overflow-auto" style="">
 
@@ -27,24 +27,25 @@
 
 @code {
     private List<AvailableQualityMethod> availableQualityMethods = new List<AvailableQualityMethod>();
-    private string filePath;
+    
 
     [Parameter]
-    public AvailableQualityMethod? selectedQualityMethod { get; set; }
+    public AddEncodeJobModel addEncodeJobModel { get; set; }
 
     [Parameter]
-    public EventCallback<AvailableQualityMethod> selectedQualityMethodChanged { get; set; }
+    public EventCallback<AddEncodeJobModel> addEncodeJobModelChanged { get; set; }
 
+    
     protected override async Task OnInitializedAsync()
     {
         availableQualityMethods = await FfmpegCodecService.getAvailableQualityMethods();
     }
-
-
+    
     private void onQualityMethodSelect(AvailableQualityMethod selectedQualityMethod)
     {
-        this.selectedQualityMethod = selectedQualityMethod;
-        this.selectedQualityMethodChanged.InvokeAsync(this.selectedQualityMethod);
+        this.addEncodeJobModel.setSelectedQualityMethod(selectedQualityMethod);
+        this.addEncodeJobModelChanged.InvokeAsync(this.addEncodeJobModel);
+
         StateHasChanged();
     }
 }

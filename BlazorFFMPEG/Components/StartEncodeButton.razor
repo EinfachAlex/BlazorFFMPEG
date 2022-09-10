@@ -60,23 +60,16 @@
 }
 
 @code {
-    [Parameter]
-    public Encoder? encoder { get; set; }
+	[Parameter]
+	public AddEncodeJobModel addEncodeJobModel { get; set; }
 
-    [Parameter]
-    public EventCallback<Encoder> encoderChanged { get; set; }
-
-    
-    [Parameter]
-    public string filePath { get; set; }
-
-    [Parameter]
-    public EventCallback<string> filePathChanged { get; set; }
+	[Parameter]
+	public EventCallback<AddEncodeJobModel> addEncodeJobModelChanged { get; set; }
     
     
     private async Task startEncode()
     {
-	    string? encode = await FfmpegCodecService.startEncode(this.filePath, this.encoder);
+	    string? encode = await FfmpegCodecService.startEncode(this.addEncodeJobModel.filePath, this.addEncodeJobModel.encoder);
 
 	    this.ShowCustomToast(encode);
     }

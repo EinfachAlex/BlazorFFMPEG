@@ -1,22 +1,19 @@
 ﻿@page "/addEncodeJob"
+@model AddEncodeJobModel
 <PageTitle>Add encode job</PageTitle>
 
 @using BlazorFFMPEG.Components
+@using BlazorFFMPEG.Data
 @using BlazorFFMPEG.Shared.DTO
 
-<CodecSelectionDropDown></CodecSelectionDropDown>
-<br/>
-<QualityMethodSelectionDropDown @bind-selectedQualityMethod="selectedQualityMethod"></QualityMethodSelectionDropDown>
-<QualityValueSliderRange @bind-selectedQualityMethod="selectedQualityMethod"></QualityValueSliderRange>
 
-<br/>
-<input @bind="filePath" style="margin: 10px"/>
-
-<button class="btn btn-primary" >Start Encode</button>
+<CodecSelectionDropDown @bind-addEncodeJobModel="model"></CodecSelectionDropDown>
+<QualityMethodSelectionDropDown @bind-addEncodeJobModel="model"></QualityMethodSelectionDropDown>
+<QualityValueSliderRange @bind-addEncodeJobModel="model"></QualityValueSliderRange>
+<FilePathInput @bind-addEncodeJobModel="model"></FilePathInput>
+<StartEncodeButton @bind-addEncodeJobModel="model"></StartEncodeButton>
 
 @code
 {
-    [Parameter]
-    public AvailableQualityMethod? selectedQualityMethod { get; set; }
-    private string filePath = "autistenkicker";
+    private AddEncodeJobModel model = new AddEncodeJobModel();
 }

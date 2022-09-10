@@ -8,14 +8,14 @@
 
 <div>
 
-    @if (selectedQualityMethod?.name == EQualityMethods.Bitrate.ToString())
+    @if (this.addEncodeJobModel.selectedQualityMethod?.name == EQualityMethods.Bitrate.ToString())
     {
-        <input type="range" class="form-range slider" min="0" max="100000" step="500" id="bitrateRange" value="@qualityValue" @oninput="@((args) => onQualityValueChange(args))">
+        <input type="range" class="form-range slider" min="0" max="100000" step="500" id="bitrateRange" value="@this.addEncodeJobModel.qualityValue" @oninput="@((args) => onQualityValueChange(args))">
 
     }
-    else if (selectedQualityMethod?.name == EQualityMethods.CQ.ToString())
+    else if (this.addEncodeJobModel.selectedQualityMethod?.name == EQualityMethods.CQ.ToString())
     {
-        <input type="range" class="form-range slider" min="0" max="63" step="1" id="cqRange" value="@qualityValue" @oninput="@((args) => onQualityValueChange(args))">
+        <input type="range" class="form-range slider" min="0" max="63" step="1" id="cqRange" value="@this.addEncodeJobModel.qualityValue" @oninput="@((args) => onQualityValueChange(args))">
     }
     else
     {
@@ -24,36 +24,29 @@
     
     <br/>
     <br/>
-    <span class="slider-text">@qualityValue</span>
+    <span class="slider-text">@this.addEncodeJobModel.qualityValue</span>
 
 </div>
 
 @code {
-    [Parameter]
-    public AvailableQualityMethod? selectedQualityMethod { get; set; }
-
-    [Parameter]
-    public EventCallback<AvailableQualityMethod> selectedQualityMethodChanged { get; set; }
-
-
-    [Parameter]
-    public int qualityValue { get; set; }
-
-    [Parameter]
-    public EventCallback<int> qualityValueChanged { get; set; }
-
     private List<Encoder> availableCodecs = new List<Encoder>();
-    private Encoder? selectedCodec;
 
+    [Parameter]
+    public AddEncodeJobModel addEncodeJobModel { get; set; }
+
+    [Parameter]
+    public EventCallback<AddEncodeJobModel> addEncodeJobModelChanged { get; set; }
+    
+    
     protected override async Task OnInitializedAsync()
     {
         availableCodecs = await FfmpegCodecService.getAvailableCodecs_WithCustomSort();
 
-        qualityValue = 15;
+        this.addEncodeJobModel.setQualityValue(15);
     }
 
     private void onQualityValueChange(ChangeEventArgs args)
     {
-        this.qualityValue = Convert.ToInt32(args.Value);
+        this.addEncodeJobModel.setQualityValue(Convert.ToInt32(args.Value));
     }
 }
