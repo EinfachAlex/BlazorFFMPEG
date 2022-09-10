@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace BlazorFFMPEG.Backend.Database
+﻿namespace BlazorFFMPEG.Backend.Database
 {
     public partial class EncodeJob
     {
@@ -10,6 +7,7 @@ namespace BlazorFFMPEG.Backend.Database
         public string? Codec { get; set; }
         public string? Path { get; set; }
 
+        [System.Text.Json.Serialization.JsonIgnore]
         public virtual ConstantsStatus StatusNavigation { get; set; } = null!;
     }
 }

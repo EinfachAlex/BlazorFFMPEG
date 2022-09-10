@@ -7,7 +7,7 @@ namespace BlazorFFMPEG.Backend.Database;
 
 public partial class EncodeJob
 {
-    public static EncodeJob constructNew(databaseContext databaseContext, bool commit, string codec, string file)
+    public static EncodeJob constructNew(databaseContext databaseContext, string codec, string file, bool commit = false)
     {
         LoggerCommonMessages.logConstructNew(file);
 
@@ -38,5 +38,11 @@ public partial class EncodeJob
         LoggerCommonMessages.logGeneratedId(id);
 
         return id;
+    }
+    public void setStatus(EEncodingStatus working)
+    {
+        Logger.i($"Changing status of {Jobid} to {working}");
+        
+        this.Status = (int)working;
     }
 }

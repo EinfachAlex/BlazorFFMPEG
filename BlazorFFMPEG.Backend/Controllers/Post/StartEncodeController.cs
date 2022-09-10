@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using BlazorFFMPEG.Backend.Database;
 using BlazorFFMPEG.Backend.Modules.Jobs;
 using BlazorFFMPEG.Backend.Modules.ServerLoad;
@@ -14,24 +16,24 @@ namespace BlazorFFMPEG.Backend.Controllers.Post
         private const ERequestTypes ENDPOINT_TYPE = ERequestTypes.POST;
 
         [HttpPost(ENDPOINT)]
-        public ContentResult PostStartEncode([FromForm] string codec, [FromForm] string inputFile)
+        public ObjectResult PostStartEncode([FromForm] string codec, [FromForm] string inputFile)
         {
             Stopwatch sw = Stopwatch.StartNew();
             LoggerCommonMessages.logEndpointRequest(ENDPOINT, ENDPOINT_TYPE);
 
-            if (codec == null || inputFile == null) return Content("No parameters given");
-            
+            if (codec == null || inputFile == null) return Problem("Du hast reingeschissen!");
+
+            EncodeJob createdEncodeJob;
             using (databaseContext databaseContext = new databaseContext())
             {
-                EncodeJobManager.getInstance()!.addEncodeJob(databaseContext, codec, inputFile);
-                databaseContext.SaveChanges();
+                createdEncodeJob = EncodeJob.constructNew(databaseContext, codec, inputFile, commit: true);
+                
+                sw.Stop();
+                Logger.v($"{sw.ElapsedMilliseconds} ms");
+                ServerLoadAnalyzer.getInstance().handleLoad(sw.ElapsedMilliseconds);
+
+                return Ok(JsonSerializer.Serialize(createdEncodeJob, new JsonSerializerOptions(){ ReferenceHandler = ReferenceHandler.IgnoreCycles}));
             }
-
-            sw.Stop();
-            Logger.v($"{sw.ElapsedMilliseconds} ms");
-            ServerLoadAnalyzer.getInstance().handleLoad(sw.ElapsedMilliseconds);
-
-            return Content("JSON");
         }
     }
 }

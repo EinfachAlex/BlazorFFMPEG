@@ -18,13 +18,8 @@ public class EncodeJobManager
     }
     private void encodeJobFoundInQueue(object? sender, QueueScanItemFoundEventArgs e)
     {
+        e.job.setStatus(EEncodingStatus.WORKING);
+        
         new FFMPEG.FFMPEG().startEncode(e.job.Path, e.job.Codec);
-    }
-    
-    public Task addEncodeJob(databaseContext databaseContext, string codec, string file)
-    {
-        EncodeJob.constructNew(databaseContext, false, codec, file);
-
-        return Task.CompletedTask;
     }
 }

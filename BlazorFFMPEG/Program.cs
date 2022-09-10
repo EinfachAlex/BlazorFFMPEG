@@ -1,6 +1,6 @@
 using BlazorFFMPEG.Data;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
+using Majorsoft.Blazor.Components.CssEvents;
+using Majorsoft.Blazor.Components.Notifications;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<FfmpegCodecService>();
+builder.Services.AddCssEvents();
+builder.Services.AddNotifications();
 
 var app = builder.Build();
 

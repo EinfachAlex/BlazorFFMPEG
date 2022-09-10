@@ -37,31 +37,18 @@ namespace BlazorFFMPEG.Data
             return availableCodecs;
         }
         
-        public async Task startEncode(string filePath, string selectedCodec)
+        public async Task<string?> startEncode(string filePath, Encoder encoder)
         {
-            Process ffmpegProcess = new Process
-            {
-                StartInfo =
-                {
-                    CreateNoWindow = true,
-                    ErrorDialog = false,
-                    RedirectStandardError = true,
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false
-                }
-            };
+            var client = new RestClient("https://localhost:7208/");
+            var request = new RestRequest("startEncode", Method.Post);
+            
+            request.AlwaysMultipartFormData = true;
+            request.AddParameter("codec", encoder.name);
+            request.AddParameter("inputFile", filePath);
+            
+            var response = await client.PostAsync(request);
 
-            ffmpegProcess.OutputDataReceived += (_, args) => Console.WriteLine(args.Data);
-            ffmpegProcess.ErrorDataReceived += (_, args) => Console.WriteLine(args.Data);
-
-            ffmpegProcess.StartInfo.FileName = "ffmpeg";
-            ffmpegProcess.StartInfo.Arguments = $" -i {filePath} -c:v {selectedCodec} out.mp4";
-
-            ffmpegProcess.Start();
-
-            ffmpegProcess.BeginErrorReadLine();
-            ffmpegProcess.BeginOutputReadLine();
-            ffmpegProcess.WaitForExit();
+            return response.Content;
         }
         
         public async Task<List<AvailableQualityMethod>> getAvailableQualityMethods()

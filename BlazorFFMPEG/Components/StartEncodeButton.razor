@@ -1,0 +1,83 @@
+﻿@inject FfmpegCodecService FfmpegCodecService
+@using BlazorFFMPEG.Data
+@using BlazorFFMPEG.Shared
+@using BlazorFFMPEG.Shared.DTO
+
+<div class="">
+    <button class="btn btn-primary" @onclick="startEncode">Start Encode</button>
+</div>
+
+@inject IToastService _toastService
+@implements IDisposable
+@code {
+	protected override void OnInitialized()
+	{
+		_toastService.OnToastShow += ToastShow;
+		_toastService.OnToastClosed += ToastClosed;
+		_toastService.OnToastCloseButtonClicked += ToastCloseButtonClicked;
+	}
+
+	private Guid _lastToastId;
+	private bool _toastShowIcon = true;
+	private bool _toastShowCloseButton = false;
+	private bool _toastShowCountdownProgress = true;
+	private uint _toastAutoCloseInSec = 50;
+	private uint _toastShadowEffect = 50;
+	private NotificationStyles _toastStyle;
+	private NotificationTypes _toastTypeLevel = NotificationTypes.Success;
+	
+	private async Task ShowCustomToast(string text)
+	{
+		_lastToastId = _toastService.ShowToast(new ToastSettings()
+		{
+			Content = builder => builder.AddMarkupContent(0, text),
+			NotificationStyle = _toastStyle,
+			Type = _toastTypeLevel,
+			AutoCloseInSec = _toastAutoCloseInSec,
+			ShadowEffect = _toastShadowEffect,
+			ShowCloseButton = _toastShowCloseButton,
+			ShowCloseCountdownProgress = _toastShowCountdownProgress,
+			ShowIcon = _toastShowIcon
+		});
+	}
+
+	private void ToastShow(Guid id)
+	{
+	}
+	private void ToastClosed(Guid id)
+	{
+	}
+	private void ToastCloseButtonClicked(Guid id)
+	{
+	}
+
+	public void Dispose()
+	{
+		_toastService.OnToastShow -= ToastShow;
+		_toastService.OnToastClosed -= ToastClosed;
+		_toastService.OnToastCloseButtonClicked -= ToastCloseButtonClicked;
+	}
+}
+
+@code {
+    [Parameter]
+    public Encoder? encoder { get; set; }
+
+    [Parameter]
+    public EventCallback<Encoder> encoderChanged { get; set; }
+
+    
+    [Parameter]
+    public string filePath { get; set; }
+
+    [Parameter]
+    public EventCallback<string> filePathChanged { get; set; }
+    
+    
+    private async Task startEncode()
+    {
+	    string? encode = await FfmpegCodecService.startEncode(this.filePath, this.encoder);
+
+	    this.ShowCustomToast(encode);
+    }
+}
