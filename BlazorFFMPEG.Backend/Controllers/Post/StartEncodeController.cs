@@ -16,7 +16,7 @@ namespace BlazorFFMPEG.Backend.Controllers.Post
         private const ERequestTypes ENDPOINT_TYPE = ERequestTypes.POST;
 
         [HttpPost(ENDPOINT)]
-        public ObjectResult PostStartEncode([FromForm] string codec, [FromForm] string inputFile)
+        public async Task<ObjectResult> PostStartEncode([FromForm] string codec, [FromForm] string inputFile)
         {
             Stopwatch sw = Stopwatch.StartNew();
             LoggerCommonMessages.logEndpointRequest(ENDPOINT, ENDPOINT_TYPE);
@@ -27,6 +27,8 @@ namespace BlazorFFMPEG.Backend.Controllers.Post
             using (databaseContext databaseContext = new databaseContext())
             {
                 createdEncodeJob = EncodeJob.constructNew(databaseContext, codec, inputFile, commit: true);
+
+                await QueueScannerJob.getInstance().forceScan(databaseContext);
                 
                 sw.Stop();
                 Logger.v($"{sw.ElapsedMilliseconds} ms");

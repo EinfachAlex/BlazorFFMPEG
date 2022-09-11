@@ -1,60 +1,109 @@
-﻿using System.Collections;
+﻿using System.Net.WebSockets;
+using System.Text;
+using BlazorFFMPEG.Backend.Controllers.Get;
 using BlazorFFMPEG.Backend.Database;
 using BlazorFFMPEG.Backend.Modules.Events;
+using EinfachAlex.Utils.Logging;
 using EinfachAlex.Utils.Threads;
-using Microsoft.EntityFrameworkCore;
 
 namespace BlazorFFMPEG.Backend.Modules.Jobs;
 
 public class QueueScannerJob
 {
     private static QueueScannerJob instance;
-    private List<EncodeJob> encodeJobs;
 
     public static QueueScannerJob getInstance()
     {
         return instance ??= new QueueScannerJob();
     }
 
+    private List<EncodeJob> encodeJobs;
+    private const int MAX_THREADS = 2;
+
     //Raised for every encode job that is found in the queue
     public delegate void SampleEventHandler(object sender, QueueScanItemFoundEventArgs e);
     public event SampleEventHandler encodeJobFoundInQueue;
-    
+
     private bool scanningEnabled = false;
-    
+
     public void startScanning()
-    {
-        scanningEnabled = true;
-
-        SetIntervalUtil.SetInterval(() =>
-            {
-                this.scan();
-            },
-            TimeSpan.FromMinutes(1));
-    }
-    
-    private async Task scan()
-    {
-        List<EncodeJob> waitingJobs = await getWaitingJobs();
-
-        raiseEvents(waitingJobs);
-    }
-    
-    public async Task<List<EncodeJob>> getWaitingJobs()
     {
         using (databaseContext databaseContext = new databaseContext())
         {
-            encodeJobs = databaseContext.EncodeJobs.Where(e => e.Status == (int)EEncodingStatus.NEW).ToList();
+            scanningEnabled = true;
+
+            checkUnfinishedJobs(databaseContext);
+
+            SetIntervalUtil.SetInterval(async () =>
+                {
+                    //Needed because variable in outer scope will get disposed
+                    using (databaseContext databaseContext = new databaseContext())
+                    {
+                        int numberActiveThreads = EncodeJobManager.getInstance()!.getNumberActiveThreads();
+
+                        if (numberActiveThreads <= MAX_THREADS)
+                        {
+                            await this.scan(databaseContext);
+                        }
+                    }
+                },
+                TimeSpan.FromMinutes(1));
+
+            this.forceScan(databaseContext); //Scan instantly at program start
         }
+    }
+
+    private void checkUnfinishedJobs(databaseContext databaseContext)
+    {
+        {
+            //Jobs with status WORKING are unfinished (this method is called directly after the program starts)
+            List<EncodeJob> unfinishedEncodeJobs = databaseContext.EncodeJobs.Where(j => j.Status == Convert.ToInt32(EEncodingStatus.WORKING)).ToList();
+
+            foreach (EncodeJob unfinishedEncodeJob in unfinishedEncodeJobs)
+            {
+                unfinishedEncodeJob.resetStatus(databaseContext);
+            }
+
+            databaseContext.SaveChanges();
+        }
+    }
+
+    private async Task scan(databaseContext databaseContext)
+    {
+        List<EncodeJob> waitingJobs = await getWaitingJobs(databaseContext);
+
+        byte[] websocketMessage = Encoding.ASCII.GetBytes($"Scanned the queue, found {waitingJobs.Count} jobs");
+        WebSocketController.websocketServer?.SendAsync(new ArraySegment<byte>(websocketMessage, 0, websocketMessage.Length), WebSocketMessageType.Text, WebSocketMessageFlags.EndOfMessage, CancellationToken.None);
+
+        raiseEvents(databaseContext, waitingJobs);
+    }
+
+    private bool maxThreadsReached()
+    {
+        bool maxThreadsReached = EncodeJobManager.getInstance()!.getNumberActiveThreads() >= MAX_THREADS;
+
+        return maxThreadsReached;
+    }
+
+    public async Task<List<EncodeJob>> getWaitingJobs(databaseContext databaseContext)
+    {
+        encodeJobs = databaseContext.EncodeJobs.Where(e => e.Status == (int)EEncodingStatus.NEW).ToList();
 
         return encodeJobs;
     }
-    
-    private void raiseEvents(List<EncodeJob> waitingJobs)
+
+    private void raiseEvents(databaseContext databaseContext, List<EncodeJob> waitingJobs)
     {
         foreach (EncodeJob encodeJob in waitingJobs)
         {
-            onEncodeJobFoundInQueue(new QueueScanItemFoundEventArgs(encodeJob));
+            if (!maxThreadsReached())
+            {
+                onEncodeJobFoundInQueue(new QueueScanItemFoundEventArgs(encodeJob));
+            }
+            else
+            {
+                break;
+            }
         }
     }
 
@@ -63,29 +112,37 @@ public class QueueScannerJob
         SampleEventHandler handler = encodeJobFoundInQueue;
         handler?.Invoke(this, e);
     }
-    
-    /*public async Task<EncodeJob> getNextWaitingJob()
+
+    public async Task forceScan(databaseContext databaseContext)
     {
-        //Todo logic which job to get first
+        Logger.v("Forcing queue scan...");
 
-        EncodeJob encodeJob;
-        using (databaseContext databaseContext = new databaseContext())
-        {
-            encodeJob = await databaseContext.EncodeJobs.FirstAsync(e => e.Status == (int)EEncodingStatus.NEW);
-        }
-
-        return encodeJob;
+        await this.scan(databaseContext);
     }
 
-    public async Task startJob(EncodeJob encodeJob)
+
+/*public async Task<EncodeJob> getNextWaitingJob()
+{
+    //Todo logic which job to get first
+
+    EncodeJob encodeJob;
+    using (databaseContext databaseContext = new databaseContext())
     {
-        await new FFMPEG.FFMPEG().startEncode(encodeJob.Path, encodeJob.Path);
+        encodeJob = await databaseContext.EncodeJobs.FirstAsync(e => e.Status == (int)EEncodingStatus.NEW);
     }
 
-    public async Task startNextWaitingJob()
-    {
-        EncodeJob nextWaitingJob = await getNextWaitingJob();
+    return encodeJob;
+}
 
-        await startJob(nextWaitingJob);
-    }*/
+public async Task startJob(EncodeJob encodeJob)
+{
+    await new FFMPEG.FFMPEG().startEncode(encodeJob.Path, encodeJob.Path);
+}
+
+public async Task startNextWaitingJob()
+{
+    EncodeJob nextWaitingJob = await getNextWaitingJob();
+
+    await startJob(nextWaitingJob);
+}*/
 }
