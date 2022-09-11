@@ -1,12 +1,15 @@
 ﻿using System.Diagnostics;
-using BlazorFFMPEG.Shared.DTO;
+using System.Net.WebSockets;
+using System.Text;
+using BlazorFFMPEG.Backend.Controllers.Get;
 using EinfachAlex.Utils.Logging;
+using Encoder = BlazorFFMPEG.Shared.DTO.Encoder;
 
 namespace BlazorFFMPEG.Backend.Modules.FFMPEG;
 
 public class FFMPEG
 {
-    public async Task startEncode(string inputFile, string codec)
+    public async Task startEncode(string inputFile, string codec, int key)
     {
         Process ffmpegProcess = new Process
         {
@@ -24,14 +27,26 @@ public class FFMPEG
         ffmpegProcess.ErrorDataReceived += (_, args) => Console.WriteLine(args.Data);
 
         ffmpegProcess.StartInfo.FileName = "ffmpeg";
-        ffmpegProcess.StartInfo.Arguments = $" -i {inputFile} -c:v {codec} out.mp4 -y";
+        ffmpegProcess.StartInfo.Arguments = $" -i {inputFile} -c:v {codec} out{key}.mp4 -y";
 
         ffmpegProcess.Start();
 
+        byte[] websocketMessage = Encoding.ASCII.GetBytes($"Starting encoding {inputFile} (Job {key}) to {codec}");
+        WebSocketController.websocketServer?.SendAsync(new ArraySegment<byte>(websocketMessage, 0, websocketMessage.Length), WebSocketMessageType.Text, WebSocketMessageFlags.EndOfMessage, CancellationToken.None);
+        
         ffmpegProcess.BeginErrorReadLine();
         ffmpegProcess.BeginOutputReadLine();
+
+        ffmpegProcess.WaitForExit();
+
+        var websocketMessageEncodingFinished = Encoding.ASCII.GetBytes($"Encoding job {key} finished.");
+        WebSocketController.websocketServer?.SendAsync(
+            new ArraySegment<byte>(websocketMessageEncodingFinished, 0, websocketMessageEncodingFinished.Length),
+            WebSocketMessageType.Text,
+            WebSocketMessageFlags.EndOfMessage,
+            CancellationToken.None);
     }
-    
+
     public async Task<List<Encoder>> getAvailableEncoders()
     {
         List<Encoder> availableEncoders = new List<Encoder>();
@@ -55,9 +70,9 @@ public class FFMPEG
                 Encoder codec = new Encoder(args.Data.Split(' ')[2].Split(' ')[0]);
 
                 if (codec.name == "=") return;
-                    
+
                 Logger.v($"Encoder {codec.name} found");
-                    
+
                 availableEncoders.Add(codec);
             }
             catch (Exception e)

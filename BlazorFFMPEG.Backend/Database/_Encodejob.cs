@@ -1,4 +1,7 @@
-﻿using BlazorFFMPEG.Backend.Modules.Jobs;
+﻿using System.Net.WebSockets;
+using System.Text;
+using BlazorFFMPEG.Backend.Controllers.Get;
+using BlazorFFMPEG.Backend.Modules.Jobs;
 using EinfachAlex.Utils.HashGenerator;
 using EinfachAlex.Utils.Logging;
 using Microsoft.EntityFrameworkCore;
@@ -39,10 +42,18 @@ public partial class EncodeJob
 
         return id;
     }
-    public void setStatus(EEncodingStatus working)
+    public void setStatus(databaseContext databaseContext, EEncodingStatus newStatus)
     {
-        Logger.i($"Changing status of {Jobid} to {working}");
-        
-        this.Status = (int)working;
+        Logger.i($"Changing status of {Jobid} from {this.StatusNavigation.Description} to {newStatus}");
+
+        byte[] websocketMessage = Encoding.ASCII.GetBytes($"Job {Jobid} is now in status {newStatus.ToString()}");
+        WebSocketController.websocketServer?.SendAsync(new ArraySegment<byte>(websocketMessage, 0, websocketMessage.Length), WebSocketMessageType.Text, WebSocketMessageFlags.EndOfMessage, CancellationToken.None);
+
+        this.Status = (int)newStatus;
+    }
+
+    public void resetStatus(databaseContext databaseContext)
+    {
+        this.setStatus(databaseContext, EEncodingStatus.NEW);
     }
 }
