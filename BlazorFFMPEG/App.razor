@@ -1,4 +1,7 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
+﻿@using Websocket.Client
+@using BlazorFFMPEG.Components
+
+<Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
@@ -10,3 +13,26 @@
         </LayoutView>
     </NotFound>
 </Router>
+
+<ToastControllerComponent></ToastControllerComponent>
+
+@code{
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+        if (firstRender)
+        {
+            WebsocketClient webSocket = null;
+            webSocket = new WebsocketClient(new Uri("wss://localhost:7208/ws"));
+	    
+            webSocket.MessageReceived.Subscribe(async msg =>
+            {
+                await ToastControllerComponent.getInstance().ShowCustomToast(msg.Text); 
+            });
+            webSocket.Start();
+        }
+    }
+    
+    
+}
