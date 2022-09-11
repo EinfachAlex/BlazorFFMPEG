@@ -1,0 +1,59 @@
+﻿@inject IToastService _toastService
+@implements IDisposable
+@code {
+	protected override void OnInitialized()
+	{
+		_toastService.OnToastShow += ToastShow;
+		_toastService.OnToastClosed += ToastClosed;
+		_toastService.OnToastCloseButtonClicked += ToastCloseButtonClicked;
+
+		instance = this;
+	}
+
+	private static Guid _lastToastId;
+	private static bool _toastShowIcon = true;
+	private static bool _toastShowCloseButton = false;
+	private static bool _toastShowCountdownProgress = true;
+	private static uint _toastAutoCloseInSec = 50;
+	private static uint _toastShadowEffect = 50;
+	private static NotificationStyles _toastStyle;
+	private static NotificationTypes _toastTypeLevel = NotificationTypes.Success;
+
+	private static ToastControllerComponent instance;
+	public static ToastControllerComponent getInstance()
+	{
+		return instance ??= new ToastControllerComponent();
+	}
+	
+	public async Task ShowCustomToast(string text)
+	{
+		_lastToastId = _toastService.ShowToast(new ToastSettings()
+		{
+			Content = builder => builder.AddMarkupContent(0, text),
+			NotificationStyle = _toastStyle,
+			Type = _toastTypeLevel,
+			AutoCloseInSec = _toastAutoCloseInSec,
+			ShadowEffect = _toastShadowEffect,
+			ShowCloseButton = _toastShowCloseButton,
+			ShowCloseCountdownProgress = _toastShowCountdownProgress,
+			ShowIcon = _toastShowIcon
+		});
+	}
+
+	private void ToastShow(Guid id)
+	{
+	}
+	private void ToastClosed(Guid id)
+	{
+	}
+	private void ToastCloseButtonClicked(Guid id)
+	{
+	}
+
+	public void Dispose()
+	{
+		_toastService.OnToastShow -= ToastShow;
+		_toastService.OnToastClosed -= ToastClosed;
+		_toastService.OnToastCloseButtonClicked -= ToastCloseButtonClicked;
+	}
+}

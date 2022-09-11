@@ -2,62 +2,21 @@
 @using BlazorFFMPEG.Data
 @using BlazorFFMPEG.Shared
 @using BlazorFFMPEG.Shared.DTO
+@using System.Net.WebSockets
+@using System.Runtime.CompilerServices
+@using System.Text
+@using Newtonsoft.Json
+@using System.Diagnostics
+@using System.Reflection.Metadata
+@using System;
+@using System.Threading;
+@using Websocket.Client;
+@using Newtonsoft.Json;
 
 <div class="">
     <button class="btn btn-primary" @onclick="startEncode">Start Encode</button>
 </div>
 
-@inject IToastService _toastService
-@implements IDisposable
-@code {
-	protected override void OnInitialized()
-	{
-		_toastService.OnToastShow += ToastShow;
-		_toastService.OnToastClosed += ToastClosed;
-		_toastService.OnToastCloseButtonClicked += ToastCloseButtonClicked;
-	}
-
-	private Guid _lastToastId;
-	private bool _toastShowIcon = true;
-	private bool _toastShowCloseButton = false;
-	private bool _toastShowCountdownProgress = true;
-	private uint _toastAutoCloseInSec = 50;
-	private uint _toastShadowEffect = 50;
-	private NotificationStyles _toastStyle;
-	private NotificationTypes _toastTypeLevel = NotificationTypes.Success;
-	
-	private async Task ShowCustomToast(string text)
-	{
-		_lastToastId = _toastService.ShowToast(new ToastSettings()
-		{
-			Content = builder => builder.AddMarkupContent(0, text),
-			NotificationStyle = _toastStyle,
-			Type = _toastTypeLevel,
-			AutoCloseInSec = _toastAutoCloseInSec,
-			ShadowEffect = _toastShadowEffect,
-			ShowCloseButton = _toastShowCloseButton,
-			ShowCloseCountdownProgress = _toastShowCountdownProgress,
-			ShowIcon = _toastShowIcon
-		});
-	}
-
-	private void ToastShow(Guid id)
-	{
-	}
-	private void ToastClosed(Guid id)
-	{
-	}
-	private void ToastCloseButtonClicked(Guid id)
-	{
-	}
-
-	public void Dispose()
-	{
-		_toastService.OnToastShow -= ToastShow;
-		_toastService.OnToastClosed -= ToastClosed;
-		_toastService.OnToastCloseButtonClicked -= ToastCloseButtonClicked;
-	}
-}
 
 @code {
 	[Parameter]
@@ -70,7 +29,34 @@
     private async Task startEncode()
     {
 	    string? encode = await FfmpegCodecService.startEncode(this.addEncodeJobModel.filePath, this.addEncodeJobModel.encoder);
-
-	    this.ShowCustomToast(encode);
+	    
+	    await ToastControllerComponent.getInstance().ShowCustomToast(encode);
     }
+	
+	public async Task HandleMessages(ClientWebSocket ws) {
+		try {
+			using (var ms = new MemoryStream()) {
+				while (ws.State == WebSocketState.Open) {
+					WebSocketReceiveResult result;
+					do {
+						var messageBuffer = WebSocket.CreateClientBuffer(1024, 16);
+						result = await ws.ReceiveAsync(messageBuffer, CancellationToken.None);
+						ms.Write(messageBuffer.Array, messageBuffer.Offset, result.Count);
+					}
+					while (!result.EndOfMessage);
+
+					if (result.MessageType == WebSocketMessageType.Text) {
+						var msgString = Encoding.UTF8.GetString(ms.ToArray());
+						var message = JsonConvert.DeserializeObject<Dictionary<String, String>>(msgString);
+						
+						Console.WriteLine(message);
+					}
+					ms.Seek(0, SeekOrigin.Begin);
+					ms.Position = 0;
+				}
+			}
+		} catch (InvalidOperationException) {
+			Console.WriteLine("ERROR");
+		}
+	}
 }
