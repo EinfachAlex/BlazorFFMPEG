@@ -26,9 +26,11 @@ public class QueueScannerJob
 
     private bool scanningEnabled = false;
 
+    public static string connectionString;
+    
     public void startScanning()
     {
-        using (databaseContext databaseContext = new databaseContext())
+        using (databaseContext databaseContext = new databaseContext(connectionString))
         {
             scanningEnabled = true;
 

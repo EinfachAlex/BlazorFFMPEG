@@ -32,10 +32,17 @@ namespace BlazorFFMPEG.Backend.Controllers.Post
 
             if (!checkParametersFilled(codec, inputFile, qualityMethod, qualityValue)) return Problem("Du hast reingeschissen!");
 
-            EncodeJob createdEncodeJob;
             using (databaseContext databaseContext = new databaseContext())
             {
-                createdEncodeJob = EncodeJob.constructNew(databaseContext, codec, inputFile, commit: true);
+                EncodeJob createdEncodeJob;
+
+                Encoder encoder = Encoder.constructByString(codec);
+                encoder.checkQualityMethodIsCompatibleWithEncoder(qualityMethod, out QualityMethod qualityMethodObject);
+                encoder.checkQualityMethodValue(qualityMethodObject, qualityValue);
+
+                long qualityValueLong = Convert.ToInt64(qualityValue);
+                
+                createdEncodeJob = EncodeJob.constructNew(databaseContext, encoder, qualityMethodObject, qualityValueLong, inputFile, commit: true);
 
                 await QueueScannerJob.getInstance().forceScan(databaseContext);
                 
@@ -45,6 +52,13 @@ namespace BlazorFFMPEG.Backend.Controllers.Post
 
                 return Ok(JsonSerializer.Serialize(createdEncodeJob, new JsonSerializerOptions(){ ReferenceHandler = ReferenceHandler.IgnoreCycles}));
             }
+        }
+        private bool checkParametersFilled(string codec, string inputFile, string qualityMethod, string qualityValue)
+        {
+            return !(String.IsNullOrEmpty(codec)
+                    || String.IsNullOrEmpty(inputFile)
+                    || String.IsNullOrEmpty(qualityMethod)
+                    || String.IsNullOrEmpty(qualityValue));
         }
     }
 }

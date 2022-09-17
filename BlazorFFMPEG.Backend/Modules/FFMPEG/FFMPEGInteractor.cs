@@ -1,9 +1,10 @@
-﻿using System.Diagnostics;
+﻿
+
+using System.Diagnostics;
 using System.Net.WebSockets;
 using System.Text;
 using BlazorFFMPEG.Backend.Controllers.Get;
 using EinfachAlex.Utils.Logging;
-using Encoder = BlazorFFMPEG.Shared.DTO.Encoder;
 
 namespace BlazorFFMPEG.Backend.Modules.FFMPEG;
 
@@ -47,9 +48,9 @@ public class FFMPEG
             CancellationToken.None);
     }
 
-    public async Task<List<Encoder>> getAvailableEncoders()
+    public async Task<List<Shared.DTO.Encoder>> getAvailableEncoders()
     {
-        List<Encoder> availableEncoders = new List<Encoder>();
+        List<Shared.DTO.Encoder> availableEncoders = new List<Shared.DTO.Encoder>();
 
         Process ffmpegProcess = new Process
         {
@@ -67,7 +68,7 @@ public class FFMPEG
         {
             try
             {
-                Encoder codec = new Encoder(args.Data.Split(' ')[2].Split(' ')[0]);
+                Shared.DTO.Encoder codec = new Shared.DTO.Encoder(args.Data.Split(' ')[2].Split(' ')[0]);
 
                 if (codec.name == "=") return;
 

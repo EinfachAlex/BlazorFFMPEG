@@ -38,6 +38,15 @@ namespace BlazorFFMPEG.Backend.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<QualityMethod>(entity =>
+            {
+                entity.ToTable("constants_qualitymethod");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.Description).HasColumnName("description");
+            });
+
             modelBuilder.Entity<ConstantsStatus>(entity =>
             {
                 entity.ToTable("constants_status");
@@ -60,9 +69,18 @@ namespace BlazorFFMPEG.Backend.Database
 
                 entity.Property(e => e.Path).HasColumnName("path");
 
+                entity.Property(e => e.Qualitymethod).HasColumnName("qualitymethod");
+
+                entity.Property(e => e.Qualityvalue).HasColumnName("qualityvalue");
+
                 entity.Property(e => e.Status)
                     .ValueGeneratedOnAdd()
                     .HasColumnName("status");
+
+                entity.HasOne(d => d.QualitymethodNavigation)
+                    .WithMany(p => p.EncodeJobs)
+                    .HasForeignKey(d => d.Qualitymethod)
+                    .HasConstraintName("fk_qualitymethod");
 
                 entity.HasOne(d => d.StatusNavigation)
                     .WithMany(p => p.EncodeJobs)
