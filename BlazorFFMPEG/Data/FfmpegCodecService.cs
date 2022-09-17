@@ -37,14 +37,16 @@ namespace BlazorFFMPEG.Data
             return availableCodecs;
         }
         
-        public async Task<string?> startEncode(string filePath, Encoder encoder)
+        public async Task<string?> startEncode(AddEncodeJobModel addEncodeJobModel)
         {
             var client = new RestClient("https://localhost:7208/");
             var request = new RestRequest("startEncode", Method.Post);
             
             request.AlwaysMultipartFormData = true;
-            request.AddParameter("codec", encoder.name);
-            request.AddParameter("inputFile", filePath);
+            request.AddParameter("codec", addEncodeJobModel.encoder.name);
+            request.AddParameter("inputFile", addEncodeJobModel.filePath);
+            request.AddParameter("qualityMethod", addEncodeJobModel.selectedQualityMethod.name);
+            request.AddParameter("qualityValue", addEncodeJobModel.qualityValue);
             
             var response = await client.PostAsync(request);
 

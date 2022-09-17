@@ -28,7 +28,7 @@
     
     private async Task startEncode()
     {
-	    string? encode = await FfmpegCodecService.startEncode(this.addEncodeJobModel.filePath, this.addEncodeJobModel.encoder);
+	    string? encode = await FfmpegCodecService.startEncode(this.addEncodeJobModel);
 	    
 	    await ToastControllerComponent.getInstance().ShowCustomToast(encode);
     }
