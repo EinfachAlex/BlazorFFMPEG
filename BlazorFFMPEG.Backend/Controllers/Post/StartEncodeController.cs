@@ -2,6 +2,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using BlazorFFMPEG.Backend.Database;
+using BlazorFFMPEG.Backend.Modules.FFMPEG.Encoder;
+using BlazorFFMPEG.Backend.Modules.FFMPEG.QualityMethods;
 using BlazorFFMPEG.Backend.Modules.Jobs;
 using BlazorFFMPEG.Backend.Modules.ServerLoad;
 using EinfachAlex.Utils.Logging;
@@ -15,6 +17,13 @@ namespace BlazorFFMPEG.Backend.Controllers.Post
         private const string ENDPOINT = "/startEncode";
         private const ERequestTypes ENDPOINT_TYPE = ERequestTypes.POST;
 
+        private readonly databaseContext _context;
+
+        public StartEncodeController(databaseContext context)
+        {
+            _context = context;
+        }
+        
         [HttpPost(ENDPOINT)]
         public async Task<ObjectResult> PostStartEncode([FromForm] string codec, [FromForm] string inputFile, [FromForm] string qualityMethod, [FromForm] string qualityValue)
         {

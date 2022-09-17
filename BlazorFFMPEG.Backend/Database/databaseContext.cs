@@ -16,6 +16,14 @@ namespace BlazorFFMPEG.Backend.Database
         {
         }
 
+        private string connectionString;
+        
+        public databaseContext(string connectionString)
+        {
+            this.connectionString = connectionString;
+        }
+
+        public virtual DbSet<QualityMethod> ConstantsQualitymethods { get; set; } = null!;
         public virtual DbSet<ConstantsStatus> ConstantsStatuses { get; set; } = null!;
         public virtual DbSet<EncodeJob> EncodeJobs { get; set; } = null!;
 
@@ -23,7 +31,7 @@ namespace BlazorFFMPEG.Backend.Database
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql("Name=ConnectionStrings:blazorFFMPEG");
+                optionsBuilder.UseNpgsql(this.connectionString);
                 optionsBuilder.UseLazyLoadingProxies();
             }
         }

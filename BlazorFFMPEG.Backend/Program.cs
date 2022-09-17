@@ -1,4 +1,7 @@
+using System.Text.Json.Serialization;
+using BlazorFFMPEG.Backend.Database;
 using BlazorFFMPEG.Backend.Modules.Jobs;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +11,20 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddControllers().AddJsonOptions(options =>
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles
+);
+
+builder.Services.AddDbContext<databaseContext>(options =>
+{
+    string connectionString = builder.Configuration.GetConnectionString("blazorFFMPEG");
+    options.UseNpgsql(connectionString);
+    options.UseLazyLoadingProxies();
+    QueueScannerJob.connectionString = connectionString;
+    
+    JobManager.getInstance().startJobThreads();
+});
 
 var app = builder.Build();
 
@@ -24,6 +41,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-JobManager.getInstance().startJobThreads();
+app.UseWebSockets();
 
 app.Run();
