@@ -16,12 +16,12 @@ namespace BlazorFFMPEG.Backend.Controllers.Post
         private const ERequestTypes ENDPOINT_TYPE = ERequestTypes.POST;
 
         [HttpPost(ENDPOINT)]
-        public async Task<ObjectResult> PostStartEncode([FromForm] string codec, [FromForm] string inputFile)
+        public async Task<ObjectResult> PostStartEncode([FromForm] string codec, [FromForm] string inputFile, [FromForm] string qualityMethod, [FromForm] string qualityValue)
         {
             Stopwatch sw = Stopwatch.StartNew();
             LoggerCommonMessages.logEndpointRequest(ENDPOINT, ENDPOINT_TYPE);
 
-            if (codec == null || inputFile == null) return Problem("Du hast reingeschissen!");
+            if (!checkParametersFilled(codec, inputFile, qualityMethod, qualityValue)) return Problem("Du hast reingeschissen!");
 
             EncodeJob createdEncodeJob;
             using (databaseContext databaseContext = new databaseContext())
