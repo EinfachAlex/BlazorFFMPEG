@@ -2,9 +2,9 @@
 
 namespace BlazorFFMPEG.Shared.Constants;
 
-public class EEncoders
+public enum EEncoders
 {
-    public const string LIBX264 = "LIBX264";
-    public const string HEVC_NVENC = "HEVC_NVENC";
-    public const string LIBSVTAV1 = "LIBSVTAV1";
+    LIBX264 = 1,
+    HEVC_NVENC = 2,
+    LIBSVTAV1 = 3,
 }

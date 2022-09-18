@@ -16,6 +16,10 @@ public class HEVC_NVENC : EncoderBase
 
         return compatibleQualityMethods;
     }
+    public override EEncoders getAsEnum()
+    {
+        return EEncoders.HEVC_NVENC;
+    }
 
     public override void checkQualityMethodValue(string qualityMethod, string qualityValue)
     {

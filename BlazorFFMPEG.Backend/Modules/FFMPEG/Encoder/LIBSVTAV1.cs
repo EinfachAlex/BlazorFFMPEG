@@ -17,6 +17,10 @@ public class LIBSVTAV1 : EncoderBase
 
         return compatibleQualityMethods;
     }
+    public override EEncoders getAsEnum()
+    {
+        return EEncoders.LIBSVTAV1;
+    }
 
     public override void checkQualityMethodValue(string qualityMethod, string qualityValue)
     {

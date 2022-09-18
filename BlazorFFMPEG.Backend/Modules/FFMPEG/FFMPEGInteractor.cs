@@ -1,18 +1,36 @@
-﻿
-
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Net.WebSockets;
 using System.Text;
 using BlazorFFMPEG.Backend.Controllers.Get;
+using BlazorFFMPEG.Backend.Modules.FFMPEG.Encoder;
+using BlazorFFMPEG.Backend.Modules.FFMPEG.QualityMethods;
+using BlazorFFMPEG.Shared.Constants;
 using EinfachAlex.Utils.Logging;
+using FFMpegCore;
+using FFMpegCore.Enums;
+using FFMpegCore.Pipes;
 
 namespace BlazorFFMPEG.Backend.Modules.FFMPEG;
 
 public class FFMPEG
 {
-    public async Task startEncode(string inputFile, string codec, int key)
+    public async Task startEncode(string inputFile, string encoder, IQualityMethod qualityMethod, int key)
     {
-        Process ffmpegProcess = new Process
+        await FFMpegArguments
+            .FromFileInput(inputFile)
+            .OutputToFile($"out{key}.mp4", true, options => options
+                .WithVideoCodec(encoder.ToLower()))
+            .NotifyOnProgress(d =>
+            {
+                Console.WriteLine(d.ToString());
+            })
+            .NotifyOnOutput(s =>
+            {
+                Console.WriteLine(s);
+            })
+            .ProcessAsynchronously();
+        
+        /*Process ffmpegProcess = new Process
         {
             StartInfo =
             {
@@ -28,18 +46,19 @@ public class FFMPEG
         ffmpegProcess.ErrorDataReceived += (_, args) => Console.WriteLine(args.Data);
 
         ffmpegProcess.StartInfo.FileName = "ffmpeg";
-        ffmpegProcess.StartInfo.Arguments = $" -i {inputFile} -c:v {codec} out{key}.mp4 -y";
+        ffmpegProcess.StartInfo.Arguments = buildFFMPEGArguments(inputFile, encoder, key);
 
         ffmpegProcess.Start();
 
-        byte[] websocketMessage = Encoding.ASCII.GetBytes($"Starting encoding {inputFile} (Job {key}) to {codec}");
-        WebSocketController.websocketServer?.SendAsync(new ArraySegment<byte>(websocketMessage, 0, websocketMessage.Length), WebSocketMessageType.Text, WebSocketMessageFlags.EndOfMessage, CancellationToken.None);
-        
+          
         ffmpegProcess.BeginErrorReadLine();
         ffmpegProcess.BeginOutputReadLine();
 
-        ffmpegProcess.WaitForExit();
-
+        ffmpegProcess.WaitForExit();*/
+        
+        byte[] websocketMessage = Encoding.ASCII.GetBytes($"Starting encoding {inputFile} (Job {key}) to {encoder.ToString()}");
+        WebSocketController.websocketServer?.SendAsync(new ArraySegment<byte>(websocketMessage, 0, websocketMessage.Length), WebSocketMessageType.Text, WebSocketMessageFlags.EndOfMessage, CancellationToken.None);
+        
         var websocketMessageEncodingFinished = Encoding.ASCII.GetBytes($"Encoding job {key} finished.");
         WebSocketController.websocketServer?.SendAsync(
             new ArraySegment<byte>(websocketMessageEncodingFinished, 0, websocketMessageEncodingFinished.Length),
@@ -47,10 +66,38 @@ public class FFMPEG
             WebSocketMessageFlags.EndOfMessage,
             CancellationToken.None);
     }
-
-    public async Task<List<Shared.DTO.Encoder>> getAvailableEncoders()
+    private static string buildFFMPEGArguments(ReadOnlySpan<char> inputFile, EncoderBase encoder, int key)
     {
-        List<Shared.DTO.Encoder> availableEncoders = new List<Shared.DTO.Encoder>();
+        string arguments = "";
+
+        arguments += addInput(inputFile);
+
+        string addInput(ReadOnlySpan<char> inputFile)
+        {
+            return "-i {inputFile}";
+        }
+
+        switch (encoder.getAsEnum())
+        {
+
+            case EEncoders.LIBX264:
+                break;
+
+            case EEncoders.HEVC_NVENC:
+                break;
+
+            case EEncoders.LIBSVTAV1:
+                break;
+
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+        return $" -i {inputFile} -c:v {encoder.ToString()} out{key}.mp4 -y";
+    }
+
+    public async Task<List<Shared.DTO.EncoderDTO>> getAvailableEncoders()
+    {
+        List<Shared.DTO.EncoderDTO> availableEncoders = new List<Shared.DTO.EncoderDTO>();
 
         Process ffmpegProcess = new Process
         {
@@ -68,7 +115,7 @@ public class FFMPEG
         {
             try
             {
-                Shared.DTO.Encoder codec = new Shared.DTO.Encoder(args.Data.Split(' ')[2].Split(' ')[0]);
+                Shared.DTO.EncoderDTO codec = new Shared.DTO.EncoderDTO(args.Data.Split(' ')[2].Split(' ')[0]);
 
                 if (codec.name == "=") return;
 
