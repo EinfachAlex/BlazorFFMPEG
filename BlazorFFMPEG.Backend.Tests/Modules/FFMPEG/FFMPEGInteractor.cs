@@ -64,7 +64,7 @@ VALUES ('Finished');
     [TestMethod]
     public async Task FFMPEGInteractor_getAvailableEncoders()
     {
-        List<Encoder> availableEncoders = await new Backend.Modules.FFMPEG.FFMPEG().getAvailableEncoders();
+        List<EncoderDTO> availableEncoders = await new Backend.Modules.FFMPEG.FFMPEG().getAvailableEncoders();
 
         //Cannot check number of encoders => different on every machine
         //But not 0 on any machine

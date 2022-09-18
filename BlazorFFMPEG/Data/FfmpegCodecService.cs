@@ -8,7 +8,7 @@ namespace BlazorFFMPEG.Data
 {
     public class FfmpegCodecService
     {
-        public async Task<List<Encoder>> getAvailableCodecs()
+        public async Task<List<EncoderDTO>> getAvailableCodecs()
         {
             var client = new RestClient("https://localhost:7208/");
             var request = new RestRequest("getAvailableEncoders", Method.Get);
@@ -16,19 +16,19 @@ namespace BlazorFFMPEG.Data
             var response = await client.GetAsync(request);
             Console.WriteLine(response.Content);
 
-            List<Encoder> encoders = JsonSerializer.Deserialize<List<Encoder>>(response.Content);
+            List<EncoderDTO> encoders = JsonSerializer.Deserialize<List<EncoderDTO>>(response.Content);
             
             return encoders;
         }
 
-        public async Task<List<Encoder>> getAvailableCodecs_WithCustomSort()
+        public async Task<List<EncoderDTO>> getAvailableCodecs_WithCustomSort()
         {
-            List<Encoder> availableCodecs = await getAvailableCodecs();
+            List<EncoderDTO> availableCodecs = await getAvailableCodecs();
 
-            List<Encoder> popularCodecs = availableCodecs.FindAll(x => x.name.ToUpper() == EEncoders.LIBX264
-                                                                       || x.name.ToUpper() == EEncoders.HEVC_NVENC);
+            List<EncoderDTO> popularCodecs = availableCodecs.FindAll(x => x.name.ToUpper() == EEncoders.LIBX264.ToString()
+                                                                       || x.name.ToUpper() == EEncoders.HEVC_NVENC.ToString());
             
-            foreach (Encoder popularCodec in popularCodecs)
+            foreach (EncoderDTO popularCodec in popularCodecs)
             {
                 availableCodecs.Remove(popularCodec);
                 availableCodecs.Insert(0, popularCodec);

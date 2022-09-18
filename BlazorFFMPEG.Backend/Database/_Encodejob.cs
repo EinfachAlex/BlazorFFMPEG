@@ -1,12 +1,12 @@
 ﻿using System.Net.WebSockets;
 using System.Text;
 using BlazorFFMPEG.Backend.Controllers.Get;
+using BlazorFFMPEG.Backend.Modules.FFMPEG.Encoder;
 using BlazorFFMPEG.Backend.Modules.FFMPEG.QualityMethods;
 using BlazorFFMPEG.Backend.Modules.Jobs;
 using EinfachAlex.Utils.HashGenerator;
 using EinfachAlex.Utils.Logging;
 using Microsoft.EntityFrameworkCore;
-using Encoder = BlazorFFMPEG.Backend.Modules.FFMPEG.Encoder.Encoder;
 
 namespace BlazorFFMPEG.Backend.Database;
 
@@ -35,15 +35,15 @@ public partial class EncodeJob
         return proxy;
     }
     
-    public static EncodeJob constructNew(databaseContext databaseContext, Encoder encoder, QualityMethod qualityMethodObject, long qualityValue, string inputFile, bool commit)
+    public static EncodeJob constructNew(databaseContext databaseContext, EncoderBase encoderBase, QualityMethod qualityMethodObject, long qualityValue, string inputFile, bool commit)
     {
         LoggerCommonMessages.logConstructNew(inputFile);
 
-        Hash id = generateId(encoder, qualityMethodObject, (int)qualityValue, inputFile);
+        Hash id = generateId(encoderBase, qualityMethodObject, (int)qualityValue, inputFile);
 
         EncodeJob proxyObject = new EncodeJob()
         {
-            Codec = encoder.ToString(),
+            Codec = encoderBase.ToString(),
             Path = inputFile,
             Status = (int)EEncodingStatus.NEW,
             Qualitymethod = qualityMethodObject.Id,
@@ -60,9 +60,9 @@ public partial class EncodeJob
         return proxy;
     }
     
-    private static Hash generateId(Encoder encoder, QualityMethod qualityMethodObject, int qualityValue, string inputFile)
+    private static Hash generateId(EncoderBase encoderBase, QualityMethod qualityMethodObject, int qualityValue, string inputFile)
     {
-        string key = $"{encoder}{qualityMethodObject.getQualityMethodAsEnum()}{qualityValue}{inputFile}";
+        string key = $"{encoderBase}{qualityMethodObject.getQualityMethodAsEnum()}{qualityValue}{inputFile}";
 
         Hash id = HashGenerator.generateSHA256(key);
         LoggerCommonMessages.logGeneratedId(id);

@@ -26,7 +26,7 @@
 </div>
 
 @code {
-    private List<Encoder> availableCodecs = new List<Encoder>();
+    private List<EncoderDTO> availableCodecs = new List<EncoderDTO>();
 
     [Parameter]
     public AddEncodeJobModel addEncodeJobModel { get; set; }
@@ -40,7 +40,7 @@
         availableCodecs = await FfmpegCodecService.getAvailableCodecs_WithCustomSort();
     }
 
-    private void onCodecSelect(Encoder selectedCodec)
+    private void onCodecSelect(EncoderDTO selectedCodec)
     {
         this.addEncodeJobModel.setEncoder(selectedCodec);
 

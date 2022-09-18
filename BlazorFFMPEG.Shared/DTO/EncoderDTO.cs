@@ -1,8 +1,8 @@
 ﻿namespace BlazorFFMPEG.Shared.DTO;
 
-public class Encoder
+public class EncoderDTO
 {
-    public Encoder(string name)
+    public EncoderDTO(string name)
     {
         this.name = name;
     }

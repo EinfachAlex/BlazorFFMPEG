@@ -1,9 +1,10 @@
 ﻿using BlazorFFMPEG.Backend.Database;
 using BlazorFFMPEG.Backend.Modules.FFMPEG.QualityMethods;
+using BlazorFFMPEG.Shared.Constants;
 
 namespace BlazorFFMPEG.Backend.Modules.FFMPEG.Encoder;
 
-public class LIBSVTAV1 : Encoder
+public class LIBSVTAV1 : EncoderBase
 {
     public override List<QualityMethod> getCompatibleQualityMethods()
     {

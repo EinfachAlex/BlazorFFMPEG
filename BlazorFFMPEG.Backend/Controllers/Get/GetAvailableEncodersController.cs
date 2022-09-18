@@ -14,12 +14,12 @@ namespace BlazorFFMPEG.Backend.Controllers.Get
         private const ERequestTypes ENDPOINT_TYPE = ERequestTypes.GET;
 
         [HttpGet(ENDPOINT)]
-        public async Task<List<Encoder>> GetAvailableEncoders()
+        public async Task<List<EncoderDTO>> GetAvailableEncoders()
         {
             Stopwatch sw = Stopwatch.StartNew();
             LoggerCommonMessages.logEndpointRequest(ENDPOINT, ENDPOINT_TYPE);
 
-            List<Encoder> availableEncodersFromFfmpeg = await new FFMPEG().getAvailableEncoders();
+            List<EncoderDTO> availableEncodersFromFfmpeg = await new FFMPEG().getAvailableEncoders();
 
             sw.Stop();
             Logger.v($"{sw.ElapsedMilliseconds} ms");

@@ -36,13 +36,13 @@ namespace BlazorFFMPEG.Backend.Controllers.Post
             {
                 EncodeJob createdEncodeJob;
 
-                Encoder encoder = Encoder.constructByString(codec);
-                encoder.checkQualityMethodIsCompatibleWithEncoder(qualityMethod, out QualityMethod qualityMethodObject);
-                encoder.checkQualityMethodValue(qualityMethodObject, qualityValue);
+                EncoderBase encoderBase = EncoderBase.constructByString(codec);
+                encoderBase.checkQualityMethodIsCompatibleWithEncoder(qualityMethod, out QualityMethod qualityMethodObject);
+                encoderBase.checkQualityMethodValue(qualityMethodObject, qualityValue);
 
                 long qualityValueLong = Convert.ToInt64(qualityValue);
                 
-                createdEncodeJob = EncodeJob.constructNew(databaseContext, encoder, qualityMethodObject, qualityValueLong, inputFile, commit: true);
+                createdEncodeJob = EncodeJob.constructNew(databaseContext, encoderBase, qualityMethodObject, qualityValueLong, inputFile, commit: true);
 
                 await QueueScannerJob.getInstance().forceScan(databaseContext);
                 

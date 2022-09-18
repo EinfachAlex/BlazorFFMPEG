@@ -5,7 +5,7 @@ namespace BlazorFFMPEG.Data;
 public class AddEncodeJobModel
 {
     public AvailableQualityMethod? selectedQualityMethod { get; private set; }
-    public Encoder? encoder { get; private set; }
+    public EncoderDTO? encoder { get; private set; }
     public int qualityValue { get; private set; }
     public string filePath { get; set; }
 
@@ -14,9 +14,9 @@ public class AddEncodeJobModel
         this.selectedQualityMethod = availableQualityMethod;
     } 
 
-    public void setEncoder(Encoder newEncoder)
+    public void setEncoder(EncoderDTO newEncoderDto)
     {
-        this.encoder = newEncoder;
+        this.encoder = newEncoderDto;
     }
     
     public void setQualityValue(int qualityValue)

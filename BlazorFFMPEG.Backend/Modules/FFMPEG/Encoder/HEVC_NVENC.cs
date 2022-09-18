@@ -1,9 +1,10 @@
 ﻿using BlazorFFMPEG.Backend.Database;
 using BlazorFFMPEG.Backend.Modules.FFMPEG.QualityMethods;
+using BlazorFFMPEG.Shared.Constants;
 
 namespace BlazorFFMPEG.Backend.Modules.FFMPEG.Encoder;
 
-public class HEVC_NVENC : Encoder
+public class HEVC_NVENC : EncoderBase
 {
     public override List<QualityMethod> getCompatibleQualityMethods()
     {

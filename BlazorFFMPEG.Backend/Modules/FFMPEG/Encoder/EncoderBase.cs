@@ -1,16 +1,21 @@
 ﻿using BlazorFFMPEG.Backend.Database;
 using BlazorFFMPEG.Backend.Modules.FFMPEG.QualityMethods;
 using BlazorFFMPEG.Shared.Constants;
+using Microsoft.OpenApi.Extensions;
 
 namespace BlazorFFMPEG.Backend.Modules.FFMPEG.Encoder;
 
-public abstract class Encoder
+public abstract class EncoderBase
 {
     public abstract List<QualityMethod> getCompatibleQualityMethods();
+
+    public abstract EEncoders getAsEnum();
     
-    public static Encoder constructByString(string encoder)
+    public static EncoderBase constructByString(string encoder)
     {
-        switch (encoder.ToUpper())
+        Enum.TryParse(encoder.ToUpper(), out EEncoders value);
+
+        switch (value)
         {
             case EEncoders.LIBX264:
                 throw new NotImplementedException();
