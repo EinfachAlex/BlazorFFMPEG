@@ -13,9 +13,9 @@ CREATE TABLE constants_qualityMethod (
     description TEXT
 );
 
-INSERT INTO constants_status(description)
+INSERT INTO constants_qualityMethod(description)
 VALUES ('CRF / CQP');
-INSERT INTO constants_status(description)
+INSERT INTO constants_qualityMethod(description)
 VALUES ('Bitrate');
 
 CREATE TABLE encode_jobs
