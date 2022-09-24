@@ -12,7 +12,7 @@ namespace BlazorFFMPEG.Backend.Database
         public int? Qualityvalue { get; set; }
         public string? Path { get; set; }
 
-        public virtual QualityMethod? QualitymethodNavigation { get; set; }
+        public virtual ConstantsQualitymethod? QualitymethodNavigation { get; set; }
         public virtual ConstantsStatus StatusNavigation { get; set; } = null!;
     }
 }

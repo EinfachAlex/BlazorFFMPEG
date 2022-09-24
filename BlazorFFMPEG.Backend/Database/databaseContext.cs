@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.VisualBasic;
 
 namespace BlazorFFMPEG.Backend.Database
 {
@@ -23,7 +24,7 @@ namespace BlazorFFMPEG.Backend.Database
             connectionString = connectionString_;
         }
 
-        public virtual DbSet<QualityMethod> ConstantsQualitymethods { get; set; } = null!;
+        public virtual DbSet<ConstantsQualitymethod> ConstantsQualitymethods { get; set; } = null!;
         public virtual DbSet<ConstantsStatus> ConstantsStatuses { get; set; } = null!;
         public virtual DbSet<EncodeJob> EncodeJobs { get; set; } = null!;
 
@@ -38,13 +39,17 @@ namespace BlazorFFMPEG.Backend.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<QualityMethod>(entity =>
+            modelBuilder.Entity<ConstantsQualitymethod>(entity =>
             {
                 entity.ToTable("constants_qualitymethod");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.Description).HasColumnName("description");
+
+                entity.Property(e => e.Maxqualityvalue).HasColumnName("maxqualityvalue");
+
+                entity.Property(e => e.Minqualityvalue).HasColumnName("minqualityvalue");
             });
 
             modelBuilder.Entity<ConstantsStatus>(entity =>

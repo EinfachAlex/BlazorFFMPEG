@@ -1,13 +1,11 @@
 ﻿using BlazorFFMPEG.Backend.Database;
-using BlazorFFMPEG.Backend.Modules.FFMPEG.QualityMethods;
 using BlazorFFMPEG.Shared.Constants;
-using Microsoft.OpenApi.Extensions;
 
 namespace BlazorFFMPEG.Backend.Modules.FFMPEG.Encoder;
 
 public abstract class EncoderBase
 {
-    public abstract List<QualityMethod> getCompatibleQualityMethods();
+    public abstract List<ConstantsQualitymethod> getCompatibleQualityMethods(databaseContext databaseContext);
 
     public abstract EEncoders getAsEnum();
     
@@ -33,14 +31,14 @@ public abstract class EncoderBase
     /**
      * Checks if given quality value and quality method combination is valid for the current encoder instance
      */
-    public virtual void checkQualityMethodValue(QualityMethod qualityMethod, string qualityValue)
+    public virtual void checkQualityMethodValue(databaseContext databaseContext, ConstantsQualitymethod qualityMethod, string qualityValue)
     {
-        QualityMethod compatibleQualityMethodSettings = this.getCompatibleQualityMethods().Find(qm => qm.getQualityMethodAsEnum() == qualityMethod.getQualityMethodAsEnum()) ?? throw new NullReferenceException();
+        ConstantsQualitymethod compatibleQualityMethodSettings = this.getCompatibleQualityMethods(databaseContext).Find(qm => qm.getQualityMethodAsEnum() == qualityMethod.getQualityMethodAsEnum()) ?? throw new NullReferenceException();
 
         long qualityValueLong = Convert.ToInt64(qualityValue);
 
-        if (compatibleQualityMethodSettings.minQualityValue > qualityValueLong
-            || compatibleQualityMethodSettings.maxQualityValue < qualityValueLong)
+        if (compatibleQualityMethodSettings.Minqualityvalue > qualityValueLong
+            || compatibleQualityMethodSettings.Maxqualityvalue < qualityValueLong)
         {
             throw new Exception("Not compatible!");
         }
@@ -55,11 +53,11 @@ public abstract class EncoderBase
     /**
      * Checks if given qualityMethod-Name is compatible with the current encoder
      */
-    public void checkQualityMethodIsCompatibleWithEncoder(string qualityMethodName, out QualityMethod qualityMethod)
+    public void checkQualityMethodIsCompatibleWithEncoder(databaseContext databaseContext, string qualityMethodName, out ConstantsQualitymethod qualityMethod)
     {
         Enum.TryParse(qualityMethodName, out EQualityMethods EQualityMethod);
 
-        qualityMethod = this.getCompatibleQualityMethods().Find(qm => qm.getQualityMethodAsEnum() == EQualityMethod)!;
+        qualityMethod = this.getCompatibleQualityMethods(databaseContext).Find(qm => qm.getQualityMethodAsEnum() == EQualityMethod)!;
 
         if (qualityMethod == null)
         {

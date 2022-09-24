@@ -6,7 +6,6 @@ using BlazorFFMPEG.Backend.Database;
 using BlazorFFMPEG.Backend.Modules.FFMPEG.Encoder;
 using BlazorFFMPEG.Backend.Modules.Logging;
 using BlazorFFMPEG.Shared.Constants;
-using EinfachAlex.Utils.Logging;
 using FFMpegCore;
 using Serilog;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
@@ -133,7 +132,7 @@ public class FFMPEG
             }
             catch (Exception e)
             {
-                Logger.v($"No encoder could be parsed for {args.Data}");
+                //Logger.v($"No encoder could be parsed for {args.Data}");
             }
         };
 

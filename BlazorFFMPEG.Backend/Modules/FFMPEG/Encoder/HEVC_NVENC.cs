@@ -1,21 +1,17 @@
 ﻿using BlazorFFMPEG.Backend.Database;
-using BlazorFFMPEG.Backend.Modules.FFMPEG.QualityMethods;
 using BlazorFFMPEG.Shared.Constants;
 
 namespace BlazorFFMPEG.Backend.Modules.FFMPEG.Encoder;
 
 public class HEVC_NVENC : EncoderBase
 {
-    public override List<QualityMethod> getCompatibleQualityMethods()
+    public override List<ConstantsQualitymethod> getCompatibleQualityMethods(databaseContext databaseContext)
     {
-        List<QualityMethod> compatibleQualityMethods = new List<QualityMethod>()
-        {
-            new BitrateQualityMethod(0, 800000),
-            new CRFQualityMethod(0, 51)
-        };
+        List<ConstantsQualitymethod> compatibleQualityMethods = databaseContext.ConstantsQualitymethods.ToList();
 
         return compatibleQualityMethods;
     }
+    
     public override EEncoders getAsEnum()
     {
         return EEncoders.HEVC_NVENC;

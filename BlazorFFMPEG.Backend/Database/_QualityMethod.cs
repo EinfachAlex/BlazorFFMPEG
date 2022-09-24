@@ -1,24 +1,9 @@
-﻿using BlazorFFMPEG.Backend.Modules.FFMPEG.QualityMethods;
-using BlazorFFMPEG.Shared.Constants;
+﻿using BlazorFFMPEG.Shared.Constants;
 
 namespace BlazorFFMPEG.Backend.Database;
 
-public partial class QualityMethod : IQualityMethod
+public partial class ConstantsQualitymethod
 {
-    public long minQualityValue { get; }
-    public long maxQualityValue { get; }
-
-    protected QualityMethod(long minQualityValue, long maxQualityValue)
-    {
-        this.minQualityValue = minQualityValue;
-        this.maxQualityValue = maxQualityValue;
-    }
-    
-    public static QualityMethod construct(string qualityMethodName, long minQualityValue, long maxQualityValue)
-    {
-        throw new NotImplementedException();
-    }
-
     // public virtual void checkValueIsCompatibleWithQualityMethod(string qualityValue)
     // {
     //     long qualityValueLong = Convert.ToInt64(qualityValue);
