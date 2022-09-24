@@ -27,6 +27,7 @@ namespace BlazorFFMPEG.Backend.Controllers.Get
         }
         
         [HttpGet(ENDPOINT)]
+        [ResponseCache(VaryByHeader = "User-Agent", Duration = 30)]
         public async Task<List<EncoderDTO>> GetAvailableEncoders()
         {
             _logger.logEndpointRequestLogMessage(ENDPOINT, ENDPOINT_TYPE);
