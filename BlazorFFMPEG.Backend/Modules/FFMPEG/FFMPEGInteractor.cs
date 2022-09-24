@@ -2,19 +2,27 @@
 using System.Net.WebSockets;
 using System.Text;
 using BlazorFFMPEG.Backend.Controllers.Get;
+using BlazorFFMPEG.Backend.Database;
 using BlazorFFMPEG.Backend.Modules.FFMPEG.Encoder;
-using BlazorFFMPEG.Backend.Modules.FFMPEG.QualityMethods;
+using BlazorFFMPEG.Backend.Modules.Logging;
 using BlazorFFMPEG.Shared.Constants;
 using EinfachAlex.Utils.Logging;
 using FFMpegCore;
-using FFMpegCore.Enums;
-using FFMpegCore.Pipes;
+using Serilog;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace BlazorFFMPEG.Backend.Modules.FFMPEG;
 
 public class FFMPEG
 {
-    public async Task startEncode(string inputFile, string encoder, IQualityMethod qualityMethod, int key)
+    private readonly ILogger _logger;
+
+    public FFMPEG(ILogger<FFMPEG> logger)
+    {
+        _logger = logger;
+    }
+    
+    public async Task startEncode(string inputFile, string encoder, ConstantsQualitymethod qualityMethod, int key)
     {
         await FFMpegArguments
             .FromFileInput(inputFile)
@@ -118,8 +126,8 @@ public class FFMPEG
                 Shared.DTO.EncoderDTO codec = new Shared.DTO.EncoderDTO(args.Data.Split(' ')[2].Split(' ')[0]);
 
                 if (codec.name == "=") return;
-
-                Logger.v($"Encoder {codec.name} found");
+                
+                _logger.logEncoderFound(codec.name);
 
                 availableEncoders.Add(codec);
             }

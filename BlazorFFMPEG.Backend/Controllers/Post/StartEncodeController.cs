@@ -1,14 +1,16 @@
-﻿using System.Diagnostics;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using BlazorFFMPEG.Backend.Database;
 using BlazorFFMPEG.Backend.Modules.FFMPEG.Encoder;
-using BlazorFFMPEG.Backend.Modules.FFMPEG.QualityMethods;
 using BlazorFFMPEG.Backend.Modules.Jobs;
+using BlazorFFMPEG.Backend.Modules.Logging;
 using BlazorFFMPEG.Backend.Modules.ServerLoad;
 using EinfachAlex.Utils.Logging;
 using EinfachAlex.Utils.WebRequest;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace BlazorFFMPEG.Backend.Controllers.Post
 {
@@ -18,47 +20,35 @@ namespace BlazorFFMPEG.Backend.Controllers.Post
         private const ERequestTypes ENDPOINT_TYPE = ERequestTypes.POST;
 
         private readonly databaseContext _context;
+        private readonly ILogger _logger;
 
-        public StartEncodeController(databaseContext context)
+
+
+        public StartEncodeController(databaseContext context, ILogger<StartEncodeController> logger)
         {
             _context = context;
+            _logger = logger;
         }
-        
+
         [HttpPost(ENDPOINT)]
-        public async Task<ObjectResult> PostStartEncode([FromForm] string codec, [FromForm] string inputFile, [FromForm] string qualityMethod, [FromForm] string qualityValue)
+        public async Task<ObjectResult> PostStartEncode([FromForm, BindRequired] string codec, [FromForm, BindRequired] string inputFile, [FromForm, BindRequired] string qualityMethod, [FromForm, BindRequired] string qualityValue)
         {
-            Stopwatch sw = Stopwatch.StartNew();
-            LoggerCommonMessages.logEndpointRequest(ENDPOINT, ENDPOINT_TYPE);
-
-            if (!checkParametersFilled(codec, inputFile, qualityMethod, qualityValue)) return Problem("Du hast reingeschissen!");
-
-            using (databaseContext databaseContext = new databaseContext())
+            if (!ModelState.IsValid)
             {
-                EncodeJob createdEncodeJob;
-
-                EncoderBase encoderBase = EncoderBase.constructByString(codec);
-                encoderBase.checkQualityMethodIsCompatibleWithEncoder(qualityMethod, out QualityMethod qualityMethodObject);
-                encoderBase.checkQualityMethodValue(qualityMethodObject, qualityValue);
-
-                long qualityValueLong = Convert.ToInt64(qualityValue);
-                
-                createdEncodeJob = EncodeJob.constructNew(databaseContext, encoderBase, qualityMethodObject, qualityValueLong, inputFile, commit: true);
-
-                await QueueScannerJob.getInstance().forceScan(databaseContext);
-                
-                sw.Stop();
-                Logger.v($"{sw.ElapsedMilliseconds} ms");
-                ServerLoadAnalyzer.getInstance().handleLoad(sw.ElapsedMilliseconds);
-
-                return Ok(JsonSerializer.Serialize(createdEncodeJob, new JsonSerializerOptions(){ ReferenceHandler = ReferenceHandler.IgnoreCycles}));
+                throw new Exception();
             }
-        }
-        private bool checkParametersFilled(string codec, string inputFile, string qualityMethod, string qualityValue)
-        {
-            return !(String.IsNullOrEmpty(codec)
-                    || String.IsNullOrEmpty(inputFile)
-                    || String.IsNullOrEmpty(qualityMethod)
-                    || String.IsNullOrEmpty(qualityValue));
+            
+            EncoderBase encoderBase = EncoderBase.constructByString(codec);
+            encoderBase.checkQualityMethodIsCompatibleWithEncoder(_context, qualityMethod, out ConstantsQualitymethod qualityMethodObject);
+            encoderBase.checkQualityMethodValue(_context, qualityMethodObject, qualityValue);
+
+            long qualityValueLong = Convert.ToInt64(qualityValue);
+
+            EncodeJob createdEncodeJob = EncodeJob.constructNew(_context, encoderBase, qualityMethodObject, qualityValueLong, inputFile, commit: true);
+
+            await QueueScannerJob.getInstance().forceScan(_context);
+
+            return Ok(JsonSerializer.Serialize(createdEncodeJob, new JsonSerializerOptions() { ReferenceHandler = ReferenceHandler.IgnoreCycles }));
         }
     }
 }
