@@ -10,13 +10,15 @@ CREATE TABLE constants_status
 
 CREATE TABLE constants_qualityMethod (
     id SERIAL PRIMARY KEY,
-    description TEXT
+    description TEXT,
+    minQualityValue INT,
+    maxQualityValue INT
 );
 
-INSERT INTO constants_qualityMethod(description)
-VALUES ('CRF / CQP');
-INSERT INTO constants_qualityMethod(description)
-VALUES ('Bitrate');
+INSERT INTO constants_qualityMethod(description, minQualityValue, maxQualityValue)
+VALUES ('CRF / CQP', 0, 1000000);
+INSERT INTO constants_qualityMethod(description, minQualityValue, maxQualityValue)
+VALUES ('Bitrate', 0, 1000000);
 
 CREATE TABLE encode_jobs
 (
