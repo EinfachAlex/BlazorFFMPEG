@@ -25,9 +25,8 @@ builder.Services.AddDbContext<databaseContext>(options =>
     string connectionString = builder.Configuration.GetConnectionString("blazorFFMPEG");
     options.UseNpgsql(connectionString);
     options.UseLazyLoadingProxies();
-    QueueScannerJob.connectionString = connectionString;
     
-    JobManager.getInstance().startJobThreads();
+    JobManager.getInstance().startJobThreads(connectionString);
 });
 
 builder.Logging.ClearProviders();
