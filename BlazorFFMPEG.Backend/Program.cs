@@ -1,7 +1,11 @@
 using System.Text.Json.Serialization;
 using BlazorFFMPEG.Backend.Database;
+using BlazorFFMPEG.Backend.Modules.FFMPEG;
 using BlazorFFMPEG.Backend.Modules.Jobs;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using Serilog.Core;
+using ILogger = Serilog.ILogger;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +29,21 @@ builder.Services.AddDbContext<databaseContext>(options =>
     
     JobManager.getInstance().startJobThreads();
 });
+
+builder.Logging.ClearProviders();
+
+
+var configuration = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json")
+    .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", true)
+    .Build();
+
+ILogger logger = new LoggerConfiguration().ReadFrom.Configuration(configuration).WriteTo.Console().CreateLogger();
+builder.Logging.AddSerilog(logger);
+builder.Services.AddSingleton(logger);
+
+builder.Services.AddSingleton<FFMPEG>();
 
 var app = builder.Build();
 
