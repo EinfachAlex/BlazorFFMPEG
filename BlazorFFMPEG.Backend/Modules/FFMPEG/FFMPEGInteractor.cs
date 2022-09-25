@@ -21,7 +21,7 @@ public class FFMPEG
         _logger = logger;
     }
     
-    public async Task startEncode(string inputFile, string encoder, ConstantsQualitymethod qualityMethod, int key)
+    public async Task startEncode(string inputFile, string encoder, string qualityMethod, int key)
     {
         await FFMpegArguments
             .FromFileInput(inputFile)
@@ -36,33 +36,7 @@ public class FFMPEG
                 Console.WriteLine(s);
             })
             .ProcessAsynchronously();
-        
-        /*Process ffmpegProcess = new Process
-        {
-            StartInfo =
-            {
-                CreateNoWindow = true,
-                ErrorDialog = false,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true,
-                UseShellExecute = false
-            }
-        };
 
-        ffmpegProcess.OutputDataReceived += (_, args) => Console.WriteLine(args.Data);
-        ffmpegProcess.ErrorDataReceived += (_, args) => Console.WriteLine(args.Data);
-
-        ffmpegProcess.StartInfo.FileName = "ffmpeg";
-        ffmpegProcess.StartInfo.Arguments = buildFFMPEGArguments(inputFile, encoder, key);
-
-        ffmpegProcess.Start();
-
-          
-        ffmpegProcess.BeginErrorReadLine();
-        ffmpegProcess.BeginOutputReadLine();
-
-        ffmpegProcess.WaitForExit();*/
-        
         byte[] websocketMessage = Encoding.ASCII.GetBytes($"Starting encoding {inputFile} (Job {key}) to {encoder.ToString()}");
         WebSocketController.websocketServer?.SendAsync(new ArraySegment<byte>(websocketMessage, 0, websocketMessage.Length), WebSocketMessageType.Text, WebSocketMessageFlags.EndOfMessage, CancellationToken.None);
         
@@ -73,35 +47,7 @@ public class FFMPEG
             WebSocketMessageFlags.EndOfMessage,
             CancellationToken.None);
     }
-    private static string buildFFMPEGArguments(ReadOnlySpan<char> inputFile, EncoderBase encoder, int key)
-    {
-        string arguments = "";
-
-        arguments += addInput(inputFile);
-
-        string addInput(ReadOnlySpan<char> inputFile)
-        {
-            return "-i {inputFile}";
-        }
-
-        switch (encoder.getAsEnum())
-        {
-
-            case EEncoders.LIBX264:
-                break;
-
-            case EEncoders.HEVC_NVENC:
-                break;
-
-            case EEncoders.LIBSVTAV1:
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-        return $" -i {inputFile} -c:v {encoder.ToString()} out{key}.mp4 -y";
-    }
-
+    
     public async Task<List<Shared.DTO.EncoderDTO>> getAvailableEncoders()
     {
         List<Shared.DTO.EncoderDTO> availableEncoders = new List<Shared.DTO.EncoderDTO>();

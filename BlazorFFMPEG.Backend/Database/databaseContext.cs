@@ -24,7 +24,6 @@ namespace BlazorFFMPEG.Backend.Database
             connectionString = connectionString_;
         }
 
-        public virtual DbSet<ConstantsQualitymethod> ConstantsQualitymethods { get; set; } = null!;
         public virtual DbSet<ConstantsStatus> ConstantsStatuses { get; set; } = null!;
         public virtual DbSet<EncodeJob> EncodeJobs { get; set; } = null!;
 
@@ -39,19 +38,6 @@ namespace BlazorFFMPEG.Backend.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ConstantsQualitymethod>(entity =>
-            {
-                entity.ToTable("constants_qualitymethod");
-
-                entity.Property(e => e.Id).HasColumnName("id");
-
-                entity.Property(e => e.Description).HasColumnName("description");
-
-                entity.Property(e => e.Maxqualityvalue).HasColumnName("maxqualityvalue");
-
-                entity.Property(e => e.Minqualityvalue).HasColumnName("minqualityvalue");
-            });
-
             modelBuilder.Entity<ConstantsStatus>(entity =>
             {
                 entity.ToTable("constants_status");
@@ -81,11 +67,6 @@ namespace BlazorFFMPEG.Backend.Database
                 entity.Property(e => e.Status)
                     .ValueGeneratedOnAdd()
                     .HasColumnName("status");
-
-                entity.HasOne(d => d.QualitymethodNavigation)
-                    .WithMany(p => p.EncodeJobs)
-                    .HasForeignKey(d => d.Qualitymethod)
-                    .HasConstraintName("fk_qualitymethod");
 
                 entity.HasOne(d => d.StatusNavigation)
                     .WithMany(p => p.EncodeJobs)

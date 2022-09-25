@@ -8,18 +8,6 @@ CREATE TABLE constants_status
     description TEXT
 );
 
-CREATE TABLE constants_qualityMethod (
-    id SERIAL PRIMARY KEY,
-    description TEXT,
-    minQualityValue INT,
-    maxQualityValue INT
-);
-
-INSERT INTO constants_qualityMethod(description, minQualityValue, maxQualityValue)
-VALUES ('CRF / CQP', 0, 1000000);
-INSERT INTO constants_qualityMethod(description, minQualityValue, maxQualityValue)
-VALUES ('Bitrate', 0, 1000000);
-
 CREATE TABLE encode_jobs
 (
     jobId  SERIAL PRIMARY KEY,
@@ -29,8 +17,7 @@ CREATE TABLE encode_jobs
     qualityValue INTEGER,
     path TEXT,
 
-    CONSTRAINT fk_status FOREIGN KEY (status) REFERENCES constants_status (id),
-    CONSTRAINT fk_qualityMethod FOREIGN KEY (qualityMethod) REFERENCES constants_qualityMethod (id)
+    CONSTRAINT fk_status FOREIGN KEY (status) REFERENCES constants_status (id)
 );
 
 INSERT INTO constants_status(description)

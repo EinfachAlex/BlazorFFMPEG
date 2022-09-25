@@ -37,12 +37,8 @@ namespace BlazorFFMPEG.Backend.Controllers.Post
                 _logger.logParametersMissing();
                 return BadRequest(ModelState);
             }
-            
-            EncoderBase encoderBase = EncoderBase.constructByString(codec);
-            encoderBase.checkQualityMethodIsCompatibleWithEncoder(_context, qualityMethod, out ConstantsQualitymethod qualityMethodObject);
-            encoderBase.checkQualityMethodValue(_context, qualityMethodObject, qualityValue);
 
-            long qualityValueLong = Convert.ToInt64(qualityValue);
+            EncodeJob createdEncodeJob = EncodeJob.constructNew(_context, codec, inputFile, qualityMethod, qualityValue, commit: true);
 
             await _queueScannerJob.forceScan(_context);
             

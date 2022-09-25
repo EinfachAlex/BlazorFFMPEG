@@ -44,7 +44,7 @@ public class EncodeJobManager
         {
             databaseContext.Attach(e.job);
             
-            await new FFMPEG.FFMPEG().startEncode(e.job.Path, e.job.Codec, e.job.QualitymethodNavigation, e.job.Jobid);
+            await _ffmpeg.startEncode(e.job.Path, e.job.Codec, e.job.Qualitymethod, e.job.Jobid);
             
             e.job.setStatus(databaseContext, EEncodingStatus.FINISHED);
             databaseContext.Update(e.job);

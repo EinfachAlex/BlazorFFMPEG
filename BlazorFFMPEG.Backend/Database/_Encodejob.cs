@@ -1,7 +1,6 @@
 ﻿using System.Net.WebSockets;
 using System.Text;
 using BlazorFFMPEG.Backend.Controllers.Get;
-using BlazorFFMPEG.Backend.Modules.FFMPEG.Encoder;
 using EinfachAlex.Utils.HashGenerator;
 using EinfachAlex.Utils.Logging;
 using Microsoft.EntityFrameworkCore;
@@ -32,19 +31,19 @@ public partial class EncodeJob
 
         return proxy;
     }
-    
-    public static EncodeJob constructNew(databaseContext databaseContext, EncoderBase encoderBase, ConstantsQualitymethod qualityMethodObject, long qualityValue, string inputFile, bool commit)
+
+    public static EncodeJob constructNew(databaseContext databaseContext, string encoder, string inputFile, string qualityMethod, long qualityValue, bool commit)
     {
         LoggerCommonMessages.logConstructNew(inputFile);
 
-        Hash id = generateId(encoderBase, qualityMethodObject, (int)qualityValue, inputFile);
+        Hash id = generateId(encoder, qualityMethod, (int)qualityValue, inputFile);
 
         EncodeJob proxyObject = new EncodeJob()
         {
-            Codec = encoderBase.ToString(),
+            Codec = encoder,
             Path = inputFile,
             Status = (int)EEncodingStatus.NEW,
-            Qualitymethod = qualityMethodObject.Id,
+            Qualitymethod = qualityMethod,
             Qualityvalue = (int)qualityValue
         };
 
@@ -58,9 +57,9 @@ public partial class EncodeJob
         return proxy;
     }
     
-    private static Hash generateId(EncoderBase encoderBase, ConstantsQualitymethod qualityMethodObject, int qualityValue, string inputFile)
+    private static Hash generateId(string encoderBase, string qualityMethodObject, int qualityValue, string inputFile)
     {
-        string key = $"{encoderBase}{qualityMethodObject.getQualityMethodAsEnum()}{qualityValue}{inputFile}";
+        string key = $"{encoderBase}{qualityMethodObject}{qualityValue}{inputFile}";
 
         Hash id = HashGenerator.generateSHA256(key);
         LoggerCommonMessages.logGeneratedId(id);
@@ -94,6 +93,4 @@ public partial class EncodeJob
     {
         this.setStatus(databaseContext, EEncodingStatus.NEW);
     }
-    
-
 }
