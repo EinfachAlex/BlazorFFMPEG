@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using BlazorFFMPEG.Backend.Database;
-using BlazorFFMPEG.Backend.Modules.FFMPEG.Encoder;
 using BlazorFFMPEG.Backend.Modules.Jobs;
 using BlazorFFMPEG.Backend.Modules.Logging;
 using BlazorFFMPEG.Backend.Modules.ServerLoad;
@@ -31,11 +30,16 @@ namespace BlazorFFMPEG.Backend.Controllers.Post
         }
 
         [HttpPost(ENDPOINT)]
-        public async Task<ObjectResult> PostStartEncode([FromForm, BindRequired] string codec, [FromForm, BindRequired] string inputFile, [FromForm, BindRequired] string qualityMethod, [FromForm, BindRequired] string qualityValue)
+        public async Task<ObjectResult> PostStartEncode(
+            [FromForm, BindRequired] string codec,
+            [FromForm, BindRequired] string inputFile, 
+            [FromForm, BindRequired] string qualityMethod, 
+            [FromForm, BindRequired] long qualityValue)
         {
             if (!ModelState.IsValid)
             {
-                throw new Exception();
+                _logger.logParametersMissing();
+                return BadRequest(ModelState);
             }
             
             EncoderBase encoderBase = EncoderBase.constructByString(codec);
