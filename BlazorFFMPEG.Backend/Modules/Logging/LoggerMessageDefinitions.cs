@@ -53,7 +53,7 @@ public static class LoggerMessageDefinitions
     
     
     private static readonly Action<ILogger, string, Exception?> parametersMissingLogMessage
-        = LoggerMessage.Define<string>(LogLevel.Information, 0, "Error: One or more parameters are missing");
+        = LoggerMessage.Define<string>(LogLevel.Information, 0, "Error: One or more parameters are missing{_}");
     
     public static void logParametersMissing(this ILogger logger)
     {
