@@ -1,5 +1,6 @@
 ﻿@using Websocket.Client
 @using BlazorFFMPEG.Components
+@using RestSharp
 
 <Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
@@ -23,16 +24,30 @@
 
         if (firstRender)
         {
-            WebsocketClient webSocket = null;
-            webSocket = new WebsocketClient(new Uri("wss://localhost:7208/ws"));
-	    
-            webSocket.MessageReceived.Subscribe(async msg =>
-            {
-                await ToastControllerComponent.getInstance().ShowCustomToast(msg.Text); 
-            });
-            webSocket.Start();
+            connectToWebsocket();
+
+            callInitEndpoint();
         }
     }
     
-    
+    private static void connectToWebsocket()
+    {
+
+        WebsocketClient webSocket = null;
+        webSocket = new WebsocketClient(new Uri("wss://localhost:7208/ws"));
+
+        webSocket.MessageReceived.Subscribe(async msg => { await ToastControllerComponent.getInstance().ShowCustomToast(msg.Text); });
+        webSocket.Start();
+    }
+
+    private async Task callInitEndpoint()
+    {
+        var client = new RestClient("https://localhost:7208/");
+        var request = new RestRequest("init", Method.Post);
+            
+        request.AlwaysMultipartFormData = true;
+
+        var response = await client.PostAsync(request);
+    }
+
 }
