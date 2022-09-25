@@ -1,12 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using BlazorFFMPEG.Backend.Database;
 using BlazorFFMPEG.Backend.Modules.Jobs;
 using BlazorFFMPEG.Backend.Modules.Logging;
-using BlazorFFMPEG.Backend.Modules.ServerLoad;
-using EinfachAlex.Utils.Logging;
 using EinfachAlex.Utils.WebRequest;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -20,13 +16,13 @@ namespace BlazorFFMPEG.Backend.Controllers.Post
 
         private readonly databaseContext _context;
         private readonly ILogger _logger;
+        private readonly QueueScannerJob _queueScannerJob;
 
-
-
-        public StartEncodeController(databaseContext context, ILogger<StartEncodeController> logger)
+        public StartEncodeController(databaseContext context, ILogger<StartEncodeController> logger, QueueScannerJob queueScannerJob)
         {
             _context = context;
             _logger = logger;
+            _queueScannerJob = queueScannerJob;
         }
 
         [HttpPost(ENDPOINT)]
@@ -48,10 +44,8 @@ namespace BlazorFFMPEG.Backend.Controllers.Post
 
             long qualityValueLong = Convert.ToInt64(qualityValue);
 
-            EncodeJob createdEncodeJob = EncodeJob.constructNew(_context, encoderBase, qualityMethodObject, qualityValueLong, inputFile, commit: true);
-
-            await QueueScannerJob.getInstance().forceScan(_context);
-
+            await _queueScannerJob.forceScan(_context);
+            
             return Ok(JsonSerializer.Serialize(createdEncodeJob, new JsonSerializerOptions() { ReferenceHandler = ReferenceHandler.IgnoreCycles }));
         }
     }

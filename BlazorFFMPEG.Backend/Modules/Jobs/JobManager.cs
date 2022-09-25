@@ -1,22 +1,35 @@
-﻿namespace BlazorFFMPEG.Backend.Modules.Jobs;
+﻿using BlazorFFMPEG.Backend.Database;
+using Microsoft.EntityFrameworkCore;
+
+namespace BlazorFFMPEG.Backend.Modules.Jobs;
 
 public class JobManager
 {
-    private static JobManager instance;
+    private readonly ILogger _logger;
+    private readonly QueueScannerJob _queueScannerJob;
 
-    public static JobManager getInstance()
+    public JobManager(ILogger<JobManager> logger, QueueScannerJob queueScannerJob)
     {
-        return instance ??= new JobManager();
+        _logger = logger;
+        _queueScannerJob = queueScannerJob;
     }
 
-    public void startJobThreads()
+    private bool jobThreadsStarted = false;
+    private string? connectionString;
+
+    public void startJobThreads(databaseContext databaseContext)
     {
-        startQueueScanner();
+        connectionString = databaseContext.Database.GetConnectionString();
+        
+        if (jobThreadsStarted) return;
+        
+        startQueueScanner(connectionString);
+        jobThreadsStarted = true;
     }
 
-    private void startQueueScanner()
+    private void startQueueScanner(string connectionString)
     {
-        Thread thread = new Thread(QueueScannerJob.getInstance().startScanning);
+        Thread thread = new Thread(() => _queueScannerJob.startScanning(connectionString));
         thread.Start();
     }
 }

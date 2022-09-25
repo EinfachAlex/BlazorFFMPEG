@@ -6,20 +6,19 @@ namespace BlazorFFMPEG.Backend.Modules.Jobs;
 
 public class EncodeJobManager
 {
-    private static EncodeJobManager? instance;
+    private readonly FFMPEG.FFMPEG _ffmpeg;
+    private readonly QueueScannerJob _queueScannerJob;
 
-    public static EncodeJobManager? getInstance()
+    public EncodeJobManager(FFMPEG.FFMPEG ffmpeg, ILogger<EncodeJobManager> logger, QueueScannerJob queueScannerJob)
     {
-        return instance ??= new EncodeJobManager();
-    }
-
-    public EncodeJobManager()
-    {
-        QueueScannerJob.getInstance().encodeJobFoundInQueue += encodeJobFoundInQueue;
+        _ffmpeg = ffmpeg;
+        _queueScannerJob = queueScannerJob;
+        
+        _queueScannerJob.encodeJobFoundInQueue += encodeJobFoundInQueue;
     }
 
     private List<Thread> activeThreads = new List<Thread>();
-    
+
     private void encodeJobFoundInQueue(object? sender, QueueScanItemFoundEventArgs e)
     {
         using (databaseContext databaseContext = new databaseContext())
@@ -51,7 +50,7 @@ public class EncodeJobManager
             databaseContext.Update(e.job);
 
             databaseContext.SaveChanges();
-            await QueueScannerJob.getInstance().forceScan(databaseContext);
+            await _queueScannerJob.forceScan(databaseContext);
         }
     }
     

@@ -10,11 +10,17 @@ namespace BlazorFFMPEG.Backend.Modules.Jobs;
 
 public class QueueScannerJob
 {
-    private static QueueScannerJob instance;
+    private readonly databaseContext _context;
+    private readonly ILogger _logger;
+    private readonly FFMPEG.FFMPEG _ffmpeg;
+    private readonly IServiceProvider _serviceProvider;
 
-    public static QueueScannerJob getInstance()
+    public QueueScannerJob(ILogger<QueueScannerJob> logger, FFMPEG.FFMPEG ffmpeg, IServiceProvider services)
     {
-        return instance ??= new QueueScannerJob();
+        //_context = context;
+        _logger = logger;
+        _ffmpeg = ffmpeg;
+        _serviceProvider = services;
     }
 
     private List<EncodeJob> encodeJobs;
@@ -39,7 +45,7 @@ public class QueueScannerJob
                     //Needed because variable in outer scope will get disposed
                     using (databaseContext databaseContext = new databaseContext())
                     {
-                        int numberActiveThreads = EncodeJobManager.getInstance()!.getNumberActiveThreads();
+                        int numberActiveThreads = _serviceProvider.GetRequiredService<EncodeJobManager>().getNumberActiveThreads();
 
                         if (numberActiveThreads <= MAX_THREADS)
                         {
@@ -80,7 +86,7 @@ public class QueueScannerJob
 
     private bool maxThreadsReached()
     {
-        bool maxThreadsReached = EncodeJobManager.getInstance()!.getNumberActiveThreads() >= MAX_THREADS;
+        bool maxThreadsReached = _serviceProvider.GetRequiredService<EncodeJobManager>().getNumberActiveThreads() >= MAX_THREADS;
 
         return maxThreadsReached;
     }

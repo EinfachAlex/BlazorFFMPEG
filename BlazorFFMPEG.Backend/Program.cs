@@ -26,8 +26,6 @@ builder.Services.AddDbContext<databaseContext>(options =>
     string connectionString = builder.Configuration.GetConnectionString("blazorFFMPEG");
     options.UseNpgsql(connectionString);
     options.UseLazyLoadingProxies();
-    
-    JobManager.getInstance().startJobThreads(connectionString);
 });
 
 builder.Logging.ClearProviders();
@@ -44,6 +42,9 @@ builder.Logging.AddSerilog(logger);
 builder.Services.AddSingleton(logger);
 
 builder.Services.AddSingleton<FFMPEG>();
+builder.Services.AddSingleton<EncodeJobManager>();
+builder.Services.AddSingleton<QueueScannerJob>();
+builder.Services.AddSingleton<JobManager>();
 
 var app = builder.Build();
 
