@@ -5,17 +5,17 @@ DROP TABLE IF EXISTS constants_qualityMethod;
 CREATE TABLE constants_status
 (
     id          SERIAL PRIMARY KEY,
-    description TEXT
+    description TEXT NOT NULL
 );
 
 CREATE TABLE encode_jobs
 (
     jobId  SERIAL PRIMARY KEY,
-    status SERIAL,
-    codec TEXT,
-    qualityMethod INTEGER,
-    qualityValue INTEGER,
-    path TEXT,
+    status INT DEFAULT 0,
+    codec TEXT NOT NULL,
+    qualityMethod TEXT NOT NULL,
+    qualityValue INTEGER NOT NULL,
+    path TEXT NOT NULL,
 
     CONSTRAINT fk_status FOREIGN KEY (status) REFERENCES constants_status (id)
 );
