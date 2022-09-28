@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.VisualBasic;
 
 namespace BlazorFFMPEG.Backend.Database
 {
@@ -65,13 +64,12 @@ namespace BlazorFFMPEG.Backend.Database
                 entity.Property(e => e.Qualityvalue).HasColumnName("qualityvalue");
 
                 entity.Property(e => e.Status)
-                    .ValueGeneratedOnAdd()
-                    .HasColumnName("status");
+                    .HasColumnName("status")
+                    .HasDefaultValueSql("0");
 
                 entity.HasOne(d => d.StatusNavigation)
                     .WithMany(p => p.EncodeJobs)
                     .HasForeignKey(d => d.Status)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("fk_status");
             });
 
