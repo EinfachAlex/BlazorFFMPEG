@@ -85,8 +85,6 @@ public partial class EncodeJob
         WebSocketController.websocketServer?.SendAsync(new ArraySegment<byte>(websocketMessage, 0, websocketMessage.Length), WebSocketMessageType.Text, WebSocketMessageFlags.EndOfMessage, CancellationToken.None);
 
         this.Status = (int)newStatus;
-        
-        databaseContext.Entry(this).Reload();
     }
 
     public void resetStatus(databaseContext databaseContext)
