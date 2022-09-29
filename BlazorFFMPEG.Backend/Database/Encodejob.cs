@@ -11,6 +11,7 @@ namespace BlazorFFMPEG.Backend.Database
         public string Qualitymethod { get; set; } = null!;
         public int Qualityvalue { get; set; }
         public string Path { get; set; } = null!;
+        public bool? Isautoencodejob { get; set; }
 
         public virtual ConstantsStatus? StatusNavigation { get; set; }
     }

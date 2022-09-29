@@ -16,8 +16,17 @@ CREATE TABLE encode_jobs
     qualityMethod TEXT NOT NULL,
     qualityValue INTEGER NOT NULL,
     path TEXT NOT NULL,
+    isAutoEncodeJob BOOLEAN DEFAULT FALSE,
 
     CONSTRAINT fk_status FOREIGN KEY (status) REFERENCES constants_status (id)
+);
+
+--List of folders that should be scanned, if video file is found it gets encoded
+CREATE TABLE auto_encode_folder
+(
+    folderId SERIAL PRIMARY KEY,
+    inputPath TEXT NOT NULL,
+    outputPath TEXT NOT NULL
 );
 
 INSERT INTO constants_status(description)

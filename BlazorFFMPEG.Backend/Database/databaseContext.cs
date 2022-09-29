@@ -22,7 +22,8 @@ namespace BlazorFFMPEG.Backend.Database
         {
             connectionString = connectionString_;
         }
-
+        
+        public virtual DbSet<AutoEncodeFolder> AutoEncodeFolders { get; set; } = null!;
         public virtual DbSet<ConstantsStatus> ConstantsStatuses { get; set; } = null!;
         public virtual DbSet<EncodeJob> EncodeJobs { get; set; } = null!;
 
@@ -37,6 +38,20 @@ namespace BlazorFFMPEG.Backend.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<AutoEncodeFolder>(entity =>
+            {
+                entity.HasKey(e => e.Folderid)
+                    .HasName("auto_encode_folder_pkey");
+
+                entity.ToTable("auto_encode_folder");
+
+                entity.Property(e => e.Folderid).HasColumnName("folderid");
+
+                entity.Property(e => e.Inputpath).HasColumnName("inputpath");
+
+                entity.Property(e => e.Outputpath).HasColumnName("outputpath");
+            });
+
             modelBuilder.Entity<ConstantsStatus>(entity =>
             {
                 entity.ToTable("constants_status");
@@ -56,6 +71,10 @@ namespace BlazorFFMPEG.Backend.Database
                 entity.Property(e => e.Jobid).HasColumnName("jobid");
 
                 entity.Property(e => e.Codec).HasColumnName("codec");
+
+                entity.Property(e => e.Isautoencodejob)
+                    .HasColumnName("isautoencodejob")
+                    .HasDefaultValueSql("false");
 
                 entity.Property(e => e.Path).HasColumnName("path");
 
