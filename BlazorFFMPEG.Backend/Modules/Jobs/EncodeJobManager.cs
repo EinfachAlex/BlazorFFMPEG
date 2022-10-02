@@ -4,6 +4,9 @@ using EinfachAlex.Utils.Logging;
 
 namespace BlazorFFMPEG.Backend.Modules.Jobs;
 
+/**
+ * Manages all encode jobs, called from <see cref="QueueScannerJob"/>
+ */
 public class EncodeJobManager
 {
     private readonly FFMPEG.FFMPEG _ffmpeg;

@@ -1,0 +1,16 @@
+﻿@page "/addEncodeJob"
+<PageTitle>Add encode job</PageTitle>
+
+@using BlazorFFMPEG.Components
+@using BlazorFFMPEG.Data
+
+<CodecSelectionDropDown @bind-addEncodeJobModel="model"></CodecSelectionDropDown>
+<QualityMethodSelectionDropDown @bind-addEncodeJobModel="model"></QualityMethodSelectionDropDown>
+<QualityValueSliderRange @bind-addEncodeJobModel="model"></QualityValueSliderRange>
+<FilePathInput @bind-addEncodeJobModel="model"></FilePathInput>
+<StartEncodeButton @bind-addEncodeJobModel="model"></StartEncodeButton>
+
+@code
+{
+    private AddEncodeJobModel model = new AddEncodeJobModel();
+}

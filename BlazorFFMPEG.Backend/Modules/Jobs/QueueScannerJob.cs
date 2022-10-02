@@ -8,6 +8,9 @@ using EinfachAlex.Utils.Threads;
 
 namespace BlazorFFMPEG.Backend.Modules.Jobs;
 
+/**
+ * Job that scans the queue (Table: encode_jobs), gets started by <see cref="JobManager"/>
+ */
 public class QueueScannerJob
 {
     private readonly databaseContext _context;
